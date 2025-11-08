@@ -1,4 +1,29 @@
 // ===========================================
+// LOGIC DARK MODE (TỪ meun.txt)
+// Phải chạy trước để tránh màn hình bị "chớp"
+// ===========================================
+// Load saved theme
+const currentMode = localStorage.getItem('theme') || 'light';
+if (currentMode === 'dark') {
+    document.body.classList.remove('light-mode');
+    document.body.classList.add('dark-mode');
+}
+
+// ===========================================
+// CÀI ĐẶT QUIZ (MỚI)
+// ===========================================
+const REVIEW_INTERVAL = 5; // Ôn lại câu sai sau 5 câu đúng (X = 5)
+
+// Biến toàn cục cho Quiz Từ Vựng
+let correctWordCount = 0, incorrectWordCount = 0, originalWordDeckLength = 0;
+let wordMistakePile = [], newCorrectWordCounter = 0;
+
+// Biến toàn cục cho Quiz Số Đếm
+let correctNumberCount = 0, incorrectNumberCount = 0, originalNumberDeckLength = 0;
+let numberMistakePile = [], newCorrectNumberCounter = 0;
+
+
+// ===========================================
 // DỮ LIỆU TỪ VỰNG TỪ TẤT CẢ CÁC UNIT
 // ===========================================
 const vocabularyData = {
@@ -12,8 +37,11 @@ const vocabularyData = {
     u2p2: [ { en: "lovely", vi: "đáng yêu", ipa: "/'lavli/" }, { en: "late", vi: "muộn", ipa: "/lert/" }, { en: "busy", vi: "bận rộn", ipa: "/'bızi/" }, { en: "kind", vi: "tốt bụng", ipa: "/kaind/" }, { en: "new", vi: "mới", ipa: "/nju:/" }, { en: "old", vi: "cũ", ipa: "/ǝuld/" } ],
     // === UNIT 3 (Original) ===
     u3p1: [ { en: "grandfather", vi: "ông", ipa: "/'grænfa: (r)/" }, { en: "grandmother", vi: "bà", ipa: "/'grænmaðǝ(r)/" }, { en: "cousin", vi: "anh/chị/em họ", ipa: "/ kazn/" }, { en: "classmate", vi: "bạn cùng lớp", ipa: "/'kla:smert/" }, { en: "banana", vi: "quả chuối", ipa: "/bə'na:nǝ/" }, { en: "cake", vi: "bánh", ipa: "/keik/" }, { en: "bag", vi: "cái túi, cái cặp", ipa: "/bæg/" }, { en: "desk", vi: "cái bàn", ipa: "/desk/" }, { en: "chair", vi: "cái ghế", ipa: "/tfeǝ(r)/" }, { en: "shirt", vi: "áo sơ mi", ipa: "3:t/" }, { en: "hat", vi: "cái mũ", ipa: "/hæt/" }, { en: "jeans", vi: "quần bò", ipa: "/dzi:nz/" }, { en: "pillow", vi: "cái gối", ipa: "/'pılǝu/" }, { en: "sock", vi: "cái tất", ipa: "/spk/" } ],
+    
     // === UNIT 4 (Original) ===
-    u4p1: [ { en: "park", vi: "công viên", ipa: "/pa:k/" }, { en: "garden", vi: "vườn", ipa: "/'ga:dn/" }, { en: "wardrobe", vi: "tủ quần áo", ipa: "/'wɔ:drǝub/" }, { en: "shopping centre", vi: "trung tâm mua sắm", ipa: "/'fupiŋ sentə(r)/" }, { en: "table", vi: "cái bàn", ipa: "/'teibl/" }, { en: "wall", vi: "tường", ipa: "/wɔ:1/" }, { en: "floor", vi: "sàn nhà", ipa: "/flo:(r)/" }, { en: "sofa", vi: "ghế sô pha", ipa: "/'sǝufa/" }, { en: "school", vi: "trường học", ipa: "/sku:1/" }, { en: "work", vi: "nơi làm việc", ipa: "/w3:k/" }, { en: "home", vi: "nhà", ipa: "/hǝom/" }, { en: "supermarket", vi: "siêu thị", ipa: "/'su:pǝma:kıt/" }, { en: "party", vi: "bữa tiệc", ipa: "/'pa:ti/" }, { en: "airport", vi: "sân bay", ipa: "/'eǝpɔ:t/" }, { en: "train station", vi: "nhà ga tàu", ipa: "/trein 'steifn/" }, { en: "clock", vi: "đồng hồ", ipa: "/klok/" }, { en: "class", vi: "lớp học", ipa: "/kla:s/" }, { en: "English", vi: "tiếng Anh", ipa: "/mglıf" }, { en: "maths", vi: "toán", ipa: "/mæls/" }, { en: "exam", vi: "kỳ thi", ipa: "/ig'zæm/" }, { en: "birthday", vi: "ngày sinh nhật", ipa: "/'b3:0de1/" } ],
+    // SỬA LỖI Ở ĐÂY
+    u4p1: [ { en: "park (n)", vi: "công viên", ipa: "/pa:k/" }, { en: "garden", vi: "vườn", ipa: "/'ga:dn/" }, { en: "wardrobe", vi: "tủ quần áo", ipa: "/'wɔ:drǝub/" }, { en: "shopping centre", vi: "trung tâm mua sắm", ipa: "/'fupiŋ sentə(r)/" }, { en: "table", vi: "cái bàn", ipa: "/'teibl/" }, { en: "wall", vi: "tường", ipa: "/wɔ:1/" }, { en: "floor", vi: "sàn nhà", ipa: "/flo:(r)/" }, { en: "sofa", vi: "ghế sô pha", ipa: "/'sǝufa/" }, { en: "school", vi: "trường học", ipa: "/sku:1/" }, { en: "work", vi: "nơi làm việc", ipa: "/w3:k/" }, { en: "home", vi: "nhà", ipa: "/hǝom/" }, { en: "supermarket", vi: "siêu thị", ipa: "/'su:pǝma:kıt/" }, { en: "party", vi: "bữa tiệc", ipa: "/'pa:ti/" }, { en: "airport", vi: "sân bay", ipa: "/'eǝpɔ:t/" }, { en: "train station", vi: "nhà ga tàu", ipa: "/trein 'steifn/" }, { en: "clock", vi: "đồng hồ", ipa: "/klok/" }, { en: "class", vi: "lớp học", ipa: "/kla:s/" }, { en: "English", vi: "tiếng Anh", ipa: "/mglıf" }, { en: "maths", vi: "toán", ipa: "/mæls/" }, { en: "exam", vi: "kỳ thi", ipa: "/ig'zæm/" }, { en: "birthday", vi: "ngày sinh nhật", ipa: "/'b3:0de1/" } ],
+    
     u4p2: [ { en: "morning", vi: "buổi sáng", ipa: "/'mo:nın/" }, { en: "afternoon", vi: "buổi chiều", ipa: "/a:ftə'nu:n/" }, { en: "evening", vi: "buổi tối", ipa: "/'i:vnın/" }, { en: "lunchtime", vi: "giờ ăn trưa", ipa: "/'lantſtaim/" }, { en: "noon", vi: "12 giờ trưa", ipa: "/nu:n/" }, { en: "midday", vi: "12 giờ trưa", ipa: "/mid'dei/" }, { en: "night", vi: "ban đêm", ipa: "/nart/" }, { en: "midnight", vi: "nửa đêm", ipa: "/'mıdnart/" } ],
     u4p3: [ { en: "Monday", vi: "thứ 2", ipa: "/'mander/" }, { en: "Tuesday", vi: "thứ 3", ipa: "/'tju:zder/" }, { en: "Wednesday", vi: "thứ 4", ipa: "/'wenzder/" }, { en: "Thursday", vi: "thứ 5", ipa: "/'03:zder/" }, { en: "Friday", vi: "thứ 6", ipa: "/'fraider/" }, { en: "Saturday", vi: "thứ 7", ipa: "/'sætǝder/" }, { en: "Sunday", vi: "chủ nhật", ipa: "/'sAnder/" } ],
     // === UNIT 5 (Original) ===
@@ -52,7 +80,7 @@ const vocabularyData = {
     u14p2: [ { en: "bicycle", vi: "xe đạp", ipa: "/'baısıkl/" }, { en: "accident", vi: "vụ tai nạn", ipa: "/'æksıdənt/" }, { en: "police", vi: "cảnh sát", ipa: "/pə'li:s/" }, { en: "clothes", vi: "quần áo", ipa: "/kləudz/" }, { en: "game", vi: "trò chơi", ipa: "/geim/" } ],
     // === UNIT 15 (Mới) ===
     u15p1: [ { en: "receive", vi: "nhận được", ipa: "/ri'si:v/" }, { en: "search", vi: "tìm kiếm", ipa: "/s3:tf/" }, { en: "marry", vi: "kết hôn", ipa: "/'mæri/" }, { en: "lose", vi: "mất", ipa: "/lu:z/" }, { en: "paint", vi: "sơn", ipa: "/peint/" }, { en: "smoke", vi: "hút thuốc", ipa: "/smǝuk/" } ],
-    u15p2: [ { en: "match", vi: "trận đấu", ipa: "/mæts/" }, { en: "song", vi: "bài hát", ipa: "/sɒŋ/" }, { en: "essay", vi: "bài luận", ipa: "/'eser/" }, { en: "minute", vi: "phút", ipa: "/'minit/" }, { en: "key", vi: "chìa khoá", ipa: "/ki:/" }, { en: "message", vi: "tin nhắn", ipa: "/'mesıd3/" }, { en: "time (lần)", vi: "lần", ipa: "/taim/" }, { en: "watch (đồng hồ)", vi: "đồng hồ", ipa: "/wɒtʃ/" } ],
+    u15p2: [ { en: "match", vi: "trận đấu", ipa: "/mæts/" }, { en: "song", vi: "bài hát", ipa: "/sɒŋ/" }, { en: "essay", vi: "bài luận", ipa: "/'eser/" }, { en: "minute", vi: "phút", ipa: "/'minit/" }, { en: "key", vi: "chìa khoá", ipa: "/ki:/" }, { en: "message", vi: "tin nhắn", ipa: "/'mesıd3/" }, { en: "time", vi: "lần", ipa: "/taim/" }, { en: "watch (đồng hồ)", vi: "đồng hồ", ipa: "/wɒtʃ/" } ],
     // === UNIT 16 (Mới) ===
     u16p1: [ { en: "return", vi: "quay trở lại", ipa: "/ri't3:n/" }, { en: "check", vi: "kiểm tra", ipa: "/tfek/" }, { en: "lend", vi: "cho mượn", ipa: "/lend/" }, { en: "look", vi: "trông có vẻ", ipa: "/luk/" }, { en: "cancel", vi: "huỷ bỏ", ipa: "/'kænsəl/" }, { en: "carry", vi: "mang, vác", ipa: "/'kæri/" }, { en: "turn on", vi: "bật lên", ipa: "/t3:n ɒn/" } ],
     u16p2: [ { en: "suitcase", vi: "va li", ipa: "/'su:tkeis/" }, { en: "drink", vi: "đồ uống", ipa: "/drink/" }, { en: "juice", vi: "nước ép", ipa: "/dzu:s/" }, { en: "heater", vi: "máy sưởi", ipa: "/'hi:tə(r)/" }, { en: "partner", vi: "bạn đời, đồng hành", ipa: "/'pa:tnə(r)/" } ],
@@ -153,12 +181,13 @@ const vocabularyData = {
     // BỔ SUNG TỪ VỰNG TỪ UNIT 22 - 27
     // ===========================================
     // === UNIT 22 (ĐỘNG TỪ KHUYẾT THIẾU) ===
+    // SỬA LỖI Ở ĐÂY
     u22p1: [
         { en: "touch", vi: "chạm vào", ipa: "/tʌtʃ/" }, // Sửa IPA từ /tats/ thành /tʌtʃ/
         { en: "enter", vi: "tiến vào, đi vào", ipa: "/'entə(r)/" },
         { en: "exercise", vi: "tập thể dục", ipa: "/'eksəsaız/" },
         { en: "borrow", vi: "mượn", ipa: "/'bɒrəʊ/" }, // Sửa IPA
-        { en: "park", vi: "đậu xe", ipa: "/pɑ:k/" },
+        { en: "park (v)", vi: "đậu xe", ipa: "/pɑ:k/" },
         { en: "sentence", vi: "câu", ipa: "/'sentəns/" },
         { en: "area", vi: "khu vực", ipa: "/'eəriə/" },
         { en: "wine", vi: "rượu", ipa: "/waın/" },
@@ -224,7 +253,7 @@ const vocabularyData = {
         { en: "continue", vi: "tiếp tục", ipa: "/kən'tɪnju:/" }
     ],
     u25p2: [ // Danh từ
-        { en: "comic", vi: "truyện tranh", ipa: "/'kɒmɪk/" },
+        { en: "comic", vi: "truyện tranh", ipa: "/'kɒmık/" },
         { en: "trip", vi: "chuyến đi", ipa: "/trɪp/" },
         { en: "grade", vi: "điểm số", ipa: "/greɪd/" },
         { en: "present", vi: "món quà", ipa: "/'preznt/" }
@@ -729,6 +758,59 @@ function shuffleArray(array) {
 }
 
 // ===========================================
+// LOGIC ÂM THANH VÀ DỊCH (ĐÃ SỬA LỖI)
+// ===========================================
+
+/**
+ * Phát âm thanh cho một đoạn text
+ * @param {Event} event - Sự kiện click (để ngăn chặn)
+ * @param {string} text - Từ cần phát âm
+ */
+function speakText(event, text) {
+    // Ngăn chặn sự kiện click lan ra các phần tử cha
+    event.stopPropagation(); 
+    
+    if ('speechSynthesis' in window) {
+        let utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US'; 
+        window.speechSynthesis.speak(utterance);
+    } else {
+        alert('Trình duyệt của bạn không hỗ trợ API phát âm.');
+    }
+}
+
+/**
+ * Mở pop-up dịch cho một đoạn text
+ * @param {Event} event - Sự kiện click (để ngăn chặn)
+ * @param {string} text - Từ cần dịch
+ */
+function translateText(event, text) {
+    // Ngăn chặn sự kiện click lan ra các phần tử cha
+    event.stopPropagation();
+
+    let sourceLang = 'auto';
+    let targetLang = 'vi';
+    
+    let encodedText = encodeURIComponent(text);
+  
+    let googleTranslateUrl = `https://translate.google.com/?sl=${sourceLang}&tl=${targetLang}&text=${encodedText}&op=translate`; 
+    
+    let popupWidth = 600;
+    let popupHeight = 700; 
+    
+    // Canh cho pop-up ra giữa màn hình
+    let left = (screen.width / 2) - (popupWidth / 2);
+    let top = (screen.height / 2) - (popupHeight / 2);
+
+    // Các tùy chọn cho cửa sổ pop-up
+    let popupFeatures = `width=${popupWidth},height=${popupHeight},left=${left},top=${top},resizable=yes,scrollbars=yes`; 
+    
+    // Mở cửa sổ pop-up
+    window.open(googleTranslateUrl, 'googleTranslatePopup', popupFeatures); 
+}
+
+
+// ===========================================
 // LOGIC CHO QUIZ TỪ VỰNG (FORM 1)
 // ===========================================
 
@@ -739,9 +821,14 @@ const WORD_QUIZ_CONTAINER_ID = 'master-quiz-container';
 
 function initializeWordQuiz() {
     currentWordIndex = 0;
-    
+    correctWordCount = 0;
+    incorrectWordCount = 0;
+    wordMistakePile = [];
+    newCorrectWordCounter = 0;
+
     // Gộp tất cả từ vựng từ các unit lại
     shuffledWordDeck = shuffleArray(Object.values(vocabularyData).flat());
+    originalWordDeckLength = shuffledWordDeck.length; // Lưu lại độ dài gốc
     
     // Lấy tất cả các nghĩa Tiếng Việt để làm lựa chọn sai
     allVietnameseDefs = shuffledWordDeck
@@ -755,8 +842,17 @@ function renderWordQuestion() {
     const quizContainer = document.getElementById(WORD_QUIZ_CONTAINER_ID);
     if (!quizContainer) return;
 
+    // Logic KHI HOÀN THÀNH (Đã cập nhật)
     if (currentWordIndex >= shuffledWordDeck.length) {
-        quizContainer.innerHTML = `<h3>🎉 Chúc mừng!</h3><p>Bạn đã hoàn thành tất cả ${shuffledWordDeck.length} từ vựng.</p><button class="btn-next" onclick="initializeWordQuiz()">Làm lại từ đầu</button>`;
+        quizContainer.innerHTML = `
+            <h3>🎉 Chúc mừng!</h3>
+            <p>Bạn đã hoàn thành ${originalWordDeckLength} câu hỏi gốc.</p>
+            <p class="quiz-score">
+                Kết quả: 
+                <span class="correct-score">${correctWordCount} Lượt Đúng</span> / 
+                <span class="incorrect-score">${incorrectWordCount} Lượt Sai</span>
+            </p>
+            <button class="btn-next" onclick="initializeWordQuiz()">Làm lại từ đầu</button>`;
         return;
     }
 
@@ -783,12 +879,16 @@ function renderWordQuestion() {
     }).join('');
 
     quizContainer.innerHTML = `
-        <div class="quiz-question">${currentWord.en}</div>
+        <div class="quiz-question">
+            <span>${currentWord.en}</span>
+            <button class="btn-audio" title="Phát âm" onclick="speakText(event, '${currentWord.en}')">🔊</button>
+            <button class="btn-translate" title="Dịch" onclick="translateText(event, '${currentWord.en}')">Dịch</button>
+        </div>
         <div class="quiz-ipa">${currentWord.ipa || '&nbsp;'}</div>
         <div class="quiz-options">${optionsHTML}</div>
         <div class="quiz-feedback"></div>
         <div class="quiz-controls">
-            <span class="quiz-status">Từ ${currentWordIndex + 1} / ${shuffledWordDeck.length}</span>
+            <span class="quiz-status">Câu ${currentWordIndex + 1} / ${originalWordDeckLength} | Cần ôn: ${wordMistakePile.length}</span>
             <div>
                 <button class="btn-5050" onclick="useFiftyFifty('${WORD_QUIZ_CONTAINER_ID}')">50/50</button>
                 <button class="btn-next hidden" onclick="nextWordQuestion()">Câu tiếp</button>
@@ -803,6 +903,9 @@ function checkWordAnswer(buttonElement) {
     const feedback = quizContainer.querySelector('.quiz-feedback');
     const optionsButtons = quizContainer.querySelectorAll('.quiz-options button');
     
+    // (Cập nhật logic đếm điểm và ôn tập)
+    const currentWord = shuffledWordDeck[currentWordIndex];
+
     optionsButtons.forEach(btn => {
         btn.disabled = true;
         if (btn.dataset.correct === 'true') {
@@ -814,11 +917,28 @@ function checkWordAnswer(buttonElement) {
     if(btn5050) btn5050.disabled = true;
 
     if (isCorrect) {
+        correctWordCount++; // Đếm điểm
+        const mistakeIndex = wordMistakePile.indexOf(currentWord);
+        
+        // Nếu câu này CÓ trong danh sách sai (tức là đang ôn tập)
+        if (mistakeIndex > -1) {
+            wordMistakePile.splice(mistakeIndex, 1); // Xóa khỏi danh sách sai
+        } else {
+            // Nếu là câu MỚI, tăng bộ đếm ôn tập
+            newCorrectWordCounter++;
+        }
+
         buttonElement.classList.add('correct');
         feedback.textContent = 'Chính xác!';
         feedback.className = 'quiz-feedback correct';
         setTimeout(nextWordQuestion, 1000); 
     } else {
+        incorrectWordCount++; // Đếm điểm
+        // Thêm vào danh sách sai nếu chưa có
+        if (!wordMistakePile.includes(currentWord)) {
+            wordMistakePile.push(currentWord);
+        }
+
         buttonElement.classList.add('incorrect');
         feedback.textContent = 'Chưa đúng!';
         feedback.className = 'quiz-feedback incorrect';
@@ -828,6 +948,16 @@ function checkWordAnswer(buttonElement) {
 
 function nextWordQuestion() {
     currentWordIndex++;
+
+    // (Logic chèn câu hỏi ôn tập MỚI)
+    // Nếu đã đúng X câu mới và còn câu sai
+    if (newCorrectWordCounter >= REVIEW_INTERVAL && wordMistakePile.length > 0) {
+        const reviewQuestion = wordMistakePile.shift(); // Lấy câu sai đầu tiên
+        // Chèn câu sai này vào ngay vị trí tiếp theo
+        shuffledWordDeck.splice(currentWordIndex, 0, reviewQuestion);
+        newCorrectWordCounter = 0; // Reset bộ đếm
+    }
+
     renderWordQuestion();
 }
 
@@ -842,7 +972,13 @@ const NUMBER_QUIZ_CONTAINER_ID = 'number-quiz-container';
 
 function initializeNumberQuiz() {
     currentNumberIndex = 0;
+    correctNumberCount = 0;
+    incorrectNumberCount = 0;
+    numberMistakePile = [];
+    newCorrectNumberCounter = 0;
+
     shuffledNumberDeck = shuffleArray(numberData);
+    originalNumberDeckLength = shuffledNumberDeck.length; // Lưu độ dài gốc
     allNumberDefs = numberData.map(num => num.vi); // Lấy tất cả các số (dạng "1", "2")
     renderNumberQuestion();
 }
@@ -851,8 +987,17 @@ function renderNumberQuestion() {
     const quizContainer = document.getElementById(NUMBER_QUIZ_CONTAINER_ID);
     if (!quizContainer) return;
 
+    // Logic KHI HOÀN THÀNH (Đã cập nhật)
     if (currentNumberIndex >= shuffledNumberDeck.length) {
-        quizContainer.innerHTML = `<h3>🎉 Chúc mừng!</h3><p>Bạn đã hoàn thành quiz số đếm.</p><button class="btn-next" onclick="initializeNumberQuiz()">Làm lại</button>`;
+        quizContainer.innerHTML = `
+            <h3>🎉 Chúc mừng!</h3>
+            <p>Bạn đã hoàn thành ${originalNumberDeckLength} câu hỏi gốc.</p>
+            <p class="quiz-score">
+                Kết quả: 
+                <span class="correct-score">${correctNumberCount} Lượt Đúng</span> / 
+                <span class="incorrect-score">${incorrectNumberCount} Lượt Sai</span>
+            </p>
+            <button class="btn-next" onclick="initializeNumberQuiz()">Làm lại</button>`;
         return;
     }
 
@@ -879,12 +1024,16 @@ function renderNumberQuestion() {
     }).join('');
 
     quizContainer.innerHTML = `
-        <div class="quiz-question">${currentNumber.en}</div>
+        <div class="quiz-question">
+            <span>${currentNumber.en}</span>
+            <button class="btn-audio" title="Phát âm" onclick="speakText(event, '${currentNumber.en}')">🔊</button>
+            <button class="btn-translate" title="Dịch" onclick="translateText(event, '${currentNumber.en}')">Dịch</button>
+        </div>
         <div class="quiz-ipa">${currentNumber.ipa || '&nbsp;'}</div>
         <div class="quiz-options">${optionsHTML}</div>
-        <div class="quiz-feedback"></div>
+        <div class="quiz-feedback"></div> 
         <div class="quiz-controls">
-            <span class="quiz-status">Số ${currentNumberIndex + 1} / ${shuffledNumberDeck.length}</span>
+            <span class="quiz-status">Câu ${currentNumberIndex + 1} / ${originalNumberDeckLength} | Cần ôn: ${numberMistakePile.length}</span>
             <div>
                 <button class="btn-5050" onclick="useFiftyFifty('${NUMBER_QUIZ_CONTAINER_ID}')">50/50</button>
                 <button class="btn-next hidden" onclick="nextNumberQuestion()">Câu tiếp</button>
@@ -899,6 +1048,9 @@ function checkNumberAnswer(buttonElement) {
     const feedback = quizContainer.querySelector('.quiz-feedback');
     const optionsButtons = quizContainer.querySelectorAll('.quiz-options button');
     
+    // (Cập nhật logic đếm điểm và ôn tập)
+    const currentNumber = shuffledNumberDeck[currentNumberIndex];
+
     optionsButtons.forEach(btn => {
         btn.disabled = true;
         if (btn.dataset.correct === 'true') {
@@ -910,11 +1062,28 @@ function checkNumberAnswer(buttonElement) {
     if(btn5050) btn5050.disabled = true;
 
     if (isCorrect) {
+        correctNumberCount++; // Đếm điểm
+        const mistakeIndex = numberMistakePile.indexOf(currentNumber);
+
+        // Nếu câu này CÓ trong danh sách sai (tức là đang ôn tập)
+        if (mistakeIndex > -1) {
+            numberMistakePile.splice(mistakeIndex, 1); // Xóa khỏi danh sách sai
+        } else {
+            // Nếu là câu MỚI, tăng bộ đếm ôn tập
+            newCorrectNumberCounter++;
+        }
+
         buttonElement.classList.add('correct');
         feedback.textContent = 'Chính xác!';
         feedback.className = 'quiz-feedback correct';
         setTimeout(nextNumberQuestion, 1000); 
     } else {
+        incorrectNumberCount++; // Đếm điểm
+        // Thêm vào danh sách sai nếu chưa có
+        if (!numberMistakePile.includes(currentNumber)) {
+            numberMistakePile.push(currentNumber);
+        }
+
         buttonElement.classList.add('incorrect');
         feedback.textContent = 'Chưa đúng!';
         feedback.className = 'quiz-feedback incorrect';
@@ -924,6 +1093,16 @@ function checkNumberAnswer(buttonElement) {
 
 function nextNumberQuestion() {
     currentNumberIndex++;
+
+    // (Logic chèn câu hỏi ôn tập MỚI)
+    // Nếu đã đúng X câu mới và còn câu sai
+    if (newCorrectNumberCounter >= REVIEW_INTERVAL && numberMistakePile.length > 0) {
+        const reviewQuestion = numberMistakePile.shift(); // Lấy câu sai đầu tiên
+        // Chèn câu sai này vào ngay vị trí tiếp theo
+        shuffledNumberDeck.splice(currentNumberIndex, 0, reviewQuestion);
+        newCorrectNumberCounter = 0; // Reset bộ đếm
+    }
+
     renderNumberQuestion();
 }
 
@@ -956,4 +1135,39 @@ document.addEventListener('DOMContentLoaded', () => {
     // Khởi tạo cả 2 quiz
     initializeWordQuiz();
     initializeNumberQuiz();
+
+    // ===========================================
+    // LOGIC EVENT LISTENER CỦA MENU (TỪ meun.txt)
+    // ===========================================
+    const body = document.body;
+    const menuBtn = document.getElementById('menuBtn');
+    const menuPanel = document.getElementById('menuPanel');
+    const toggleBtn = document.getElementById('toggleBtn');
+
+    // Toggle menu
+    menuBtn.addEventListener('click', () => {
+        menuBtn.classList.toggle('active');
+        menuPanel.classList.toggle('show');
+    });
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!menuBtn.contains(e.target) && !menuPanel.contains(e.target)) {
+            menuBtn.classList.remove('active');
+            menuPanel.classList.remove('show');
+        }
+    });
+    
+    // Toggle dark mode
+    toggleBtn.addEventListener('click', () => {
+        if (body.classList.contains('light-mode')) {
+            body.classList.remove('light-mode');
+            body.classList.add('dark-mode');
+            localStorage.setItem('theme', 'dark');
+        } else {
+            body.classList.remove('dark-mode');
+            body.classList.add('light-mode');
+            localStorage.setItem('theme', 'light');
+        }
+    });
 });
