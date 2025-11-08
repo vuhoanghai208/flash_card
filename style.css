@@ -3,6 +3,9 @@ body {
     background-color: #f4f4f9;
     padding: 20px;
     color: #333;
+    /* Transition sẽ được xử lý bởi CSS của menu 
+      nên chúng ta có thể xóa nó khỏi đây nếu muốn.
+    */
 }
 
 header {
@@ -20,14 +23,10 @@ header {
     border-radius: 12px;
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.07);
     border: 1px solid #e0e0e0;
+    transition: background-color 0.3s ease, border-color 0.3s ease; /* Thêm transition */
 }
 
-.unit-section > h2 {
-    border-bottom: 2px solid #007bff;
-    padding-bottom: 10px;
-    margin-bottom: 30px;
-    color: #007bff;
-}
+/* ... (toàn bộ CSS quiz gốc của bạn không đổi) ... */
 
 .quiz-container {
     background: #fafafa;
@@ -35,29 +34,42 @@ header {
     border-radius: 8px;
     padding: 24px;
     min-height: 400px; /* Đảm bảo chiều cao ổn định */
+    transition: background-color 0.3s ease, border-color 0.3s ease; /* Thêm transition */
 }
 
-/* Phần câu hỏi */
 .quiz-question {
     font-size: 1.8em;
     font-weight: bold;
     color: #007bff;
     margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap; 
+}
+.quiz-question button {
+    font-size: 0.6em; 
+    padding: 6px 10px;
+    margin-left: 10px; 
+    cursor: pointer; 
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    transition: background-color 0.2s;
+}
+.quiz-question button:hover {
+    background-color: #e0e0e0;
 }
 .quiz-ipa {
     font-size: 1.1em;
     color: #666;
     margin-bottom: 25px;
 }
-
-/* Phần các lựa chọn A, B, C, D */
 .quiz-options {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 15px;
     margin-bottom: 20px;
 }
-
 .quiz-options button {
     width: 100%;
     padding: 15px;
@@ -69,13 +81,10 @@ header {
     cursor: pointer;
     transition: all 0.2s ease;
 }
-
 .quiz-options button:hover:not(:disabled) {
     background-color: #e6f0ff;
     border-color: #007bff;
 }
-
-/* Trạng thái khi trả lời */
 .quiz-options button:disabled {
     cursor: not-allowed;
     opacity: 0.8;
@@ -94,22 +103,19 @@ header {
 .quiz-options button.hidden {
     visibility: hidden;
 }
-
-/* Phần điều khiển (50/50, Next) */
 .quiz-controls {
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-top: 1px solid #eee;
     padding-top: 20px;
+    transition: border-color 0.3s ease; /* Thêm transition */
 }
-
 .quiz-status {
     font-size: 0.9em;
     color: #777;
     font-weight: bold;
 }
-
 .quiz-controls button {
     padding: 10px 20px;
     border: none;
@@ -118,7 +124,6 @@ header {
     cursor: pointer;
     transition: background-color 0.3s;
 }
-
 .btn-5050 {
     background-color: #ffc107;
     color: #333;
@@ -130,7 +135,6 @@ header {
     background-color: #ccc;
     cursor: not-allowed;
 }
-
 .btn-next {
     background-color: #007bff;
     color: white;
@@ -141,18 +145,276 @@ header {
 .btn-next.hidden {
     display: none;
 }
-
-/* Phần thông báo kết quả */
 .quiz-feedback {
     margin-top: 15px;
     font-size: 1.2em;
     font-weight: bold;
     text-align: center;
-    height: 25px; /* Giữ không gian cho feedback */
+    height: 25px; 
 }
 .quiz-feedback.correct {
     color: #28a745;
 }
 .quiz-feedback.incorrect {
     color: #dc3545;
+}
+
+
+/* =================================== */
+/* PHẦN CSS CỦA MENU (TỪ meun.txt)   */
+/* =================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Sửa đổi 'body' gốc và hợp nhất các thuộc tính
+  Chúng ta sẽ dùng 'body' gốc của bạn,
+  nhưng thêm transition từ meun.txt
+*/
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9; /* Màu light-mode gốc */
+    padding: 20px;
+    color: #333;
+    min-height: 100vh;
+    transition: background-color 0.3s ease, color 0.3s ease; /* Thêm 'color' transition */
+}
+
+/* Không cần body.light-mode vì nó đã là mặc định */
+/* body.light-mode { } */
+
+body.dark-mode {
+    background-color: #1a1a1a;
+    color: #e0e0e0; /* Thêm màu chữ cho dark mode */
+}
+
+.menu-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.menu-button {
+    width: 50px;
+    height: 50px;
+    background-color: #667eea;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.menu-button:hover {
+    transform: scale(1.05);
+}
+
+body.dark-mode .menu-button {
+    background-color: #4a5568;
+}
+
+.menu-button span {
+    width: 25px;
+    height: 3px;
+    background-color: white;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
+
+.menu-button.active span:nth-child(1) {
+    transform: rotate(45deg) translateY(8px);
+}
+
+.menu-button.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.menu-button.active span:nth-child(3) {
+    transform: rotate(-45deg) translateY(-8px);
+}
+
+.menu-panel {
+    position: absolute;
+    top: 60px;
+    right: 0;
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+}
+
+body.dark-mode .menu-panel {
+    background: #2d2d2d;
+}
+
+.menu-panel.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.menu-label {
+    font-size: 14px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+body.dark-mode .menu-label {
+    color: #e0e0e0;
+}
+
+.toggle-btn {
+    position: relative;
+    width: 80px;
+    height: 40px;
+    background-color: #ccc;
+    border-radius: 40px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-btn::before {
+    content: '';
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    background-color: white;
+    border-radius: 50%;
+    top: 4px;
+    left: 4px;
+    transition: transform 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+body.dark-mode .toggle-btn {
+    background-color: #4a5568;
+}
+
+body.dark-mode .toggle-btn::before {
+    transform: translateX(40px);
+    background-color: #ffd700;
+}
+
+
+/* =================================== */
+/* PHẦN CSS MỚI: DARK MODE OVERRIDES   */
+/* =================================== */
+
+body.dark-mode header {
+    color: #667eea;
+}
+
+body.dark-mode .unit-section {
+    background-color: #2d2d2d;
+    border-color: #4a4a4a;
+}
+
+body.dark-mode .unit-section > h2 {
+    border-bottom-color: #667eea;
+    color: #667eea;
+}
+
+body.dark-mode .quiz-container {
+    background: #252525;
+    border-color: #444;
+}
+
+body.dark-mode .quiz-question {
+    color: #667eea;
+}
+
+body.dark-mode .quiz-question button {
+    background-color: #4a5568;
+    border-color: #777;
+    color: #f0f0f0;
+}
+body.dark-mode .quiz-question button:hover {
+    background-color: #5a6578;
+}
+
+body.dark-mode .quiz-ipa {
+    color: #aaa;
+}
+
+body.dark-mode .quiz-options button {
+    background-color: #4a5568;
+    border-color: #777;
+    color: #f0f0f0;
+}
+
+body.dark-mode .quiz-options button:hover:not(:disabled) {
+    background-color: #5a6578;
+    border-color: #667eea;
+}
+
+/* Các nút correct/incorrect đã có màu chữ trắng nên không cần sửa */
+
+body.dark-mode .quiz-controls {
+    border-top-color: #444;
+}
+
+body.dark-mode .quiz-status {
+    color: #bbb;
+}
+
+body.dark-mode .btn-5050 {
+    color: #1a1a1a; /* Đổi màu chữ vàng cho dễ đọc */
+}
+
+body.dark-mode .quiz-feedback.correct {
+    color: #38c172; /* Lighter green */
+}
+
+body.dark-mode .quiz-feedback.incorrect {
+    color: #e3342f; /* Lighter red */
+}
+.quiz-score {
+    text-align: center;
+    font-size: 1.3em;
+    font-weight: bold;
+    margin: 20px 0 25px 0;
+}
+.quiz-score .correct-score {
+    color: #28a745;
+    margin-right: 15px; /* Tạo khoảng cách */
+}
+.quiz-score .incorrect-score {
+    color: #dc3545;
+}
+
+/* Dark mode overrides for score */
+body.dark-mode .quiz-score .correct-score {
+    color: #38c172;
+}
+body.dark-mode .quiz-score .incorrect-score {
+    color: #e3342f;
+}
+/* =================================== */
+/* SỬA LỖI MÀU NÚT TRONG DARK MODE   */
+/* =================================== */
+
+body.dark-mode .quiz-options button.correct {
+    background-color: #28a745;
+    border-color: #218838;
+    color: white;
+}
+
+body.dark-mode .quiz-options button.incorrect {
+    background-color: #dc3545;
+    border-color: #c82333;
+    color: white;
 }
