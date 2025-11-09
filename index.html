@@ -16,17 +16,23 @@
     </header>
 
     <main>
-        <section class="unit-section">
-            <h2>ÔN TẬP TỪ VỰNG (ALL UNITS)</h2>
-            <div id="master-quiz-container" class="quiz-container">
-                </div>
-        </section>
+        <nav id="main-menu">
+            <h2>CHỌN MỘT CHỦ ĐỀ ĐỂ BẮT ĐẦU</h2>
+            <div class="menu-grid">
+                <button class="category-btn" data-quiz="master-quiz-container">Ôn tập từ vựng (All Units)</button>
+                <button class="category-btn" data-quiz="number-quiz-container">Ôn tập số đếm (Unit 20)</button>
+            </div>
+        </nav>
 
-        <section class="unit-section">
-            <h2>ÔN TẬP SỐ ĐẾM (UNIT 20)</h2>
-            <div id="number-quiz-container" class="quiz-container">
-                </div>
-        </section>
+        <div id="quiz-area" class="hidden">
+            <button id="back-to-menu-btn">&larr; Quay lại Menu</button>
+            <section id="master-quiz-section" class="unit-section hidden">
+                <div id="master-quiz-container" class="quiz-container"></div>
+            </section>
+            <section id="number-quiz-section" class="unit-section hidden">
+                <div id="number-quiz-container" class="quiz-container"></div>
+            </section>
+        </div>
     </main>
 
     <script src="eng.js"></script>
