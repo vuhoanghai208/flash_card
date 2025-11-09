@@ -2028,6 +2028,7 @@ class QuizManager {
         this.shuffledDeck = [];
         this.originalLength = 0;
         this.allOptions = [];
+        this.storageKey = `quizState_${this.containerId}`;
         this.timeoutId = null;
     }
 
@@ -2037,15 +2038,47 @@ class QuizManager {
         this.incorrectCount = 0;
         this.mistakePile = [];
         this.newCorrectCounter = 0;
-        
-        // Tối ưu: Dùng Set thay vì filter
-        this.shuffledDeck = shuffleArray(
-            this.type === 'word' ? Object.values(this.data).flat() : this.data
-        );
-        this.originalLength = this.shuffledDeck.length;
-        this.allOptions = [...new Set(this.shuffledDeck.map(item => item.vi).filter(Boolean))];
-        
-        this.render();
+
+        if (!this.loadState()) {
+            // Tối ưu: Dùng Set thay vì filter
+            this.shuffledDeck = shuffleArray(
+                this.type === 'word' ? Object.values(this.data).flat() : this.data
+            );
+            this.originalLength = this.shuffledDeck.length;
+            this.allOptions = [...new Set(this.shuffledDeck.map(item => item.vi).filter(Boolean))];
+            this.render();
+        }
+    }
+
+    saveState() {
+        const state = {
+            currentIndex: this.currentIndex,
+            correctCount: this.correctCount,
+            incorrectCount: this.incorrectCount,
+            mistakePile: this.mistakePile,
+            newCorrectCounter: this.newCorrectCounter,
+            shuffledDeck: this.shuffledDeck,
+            originalLength: this.originalLength,
+        };
+        localStorage.setItem(this.storageKey, JSON.stringify(state));
+    }
+
+    loadState() {
+        const savedState = localStorage.getItem(this.storageKey);
+        if (savedState) {
+            const state = JSON.parse(savedState);
+            this.currentIndex = state.currentIndex;
+            this.correctCount = state.correctCount;
+            this.incorrectCount = state.incorrectCount;
+            this.mistakePile = state.mistakePile;
+            this.newCorrectCounter = state.newCorrectCounter;
+            this.shuffledDeck = state.shuffledDeck;
+            this.originalLength = state.originalLength;
+            this.allOptions = [...new Set(this.shuffledDeck.map(item => item.vi).filter(Boolean))];
+            this.render();
+            return true;
+        }
+        return false;
     }
 
     render() {
@@ -2154,6 +2187,8 @@ class QuizManager {
         }
 
         this.render();
+
+        this.saveState();
     }
 
     useFiftyFifty() {
@@ -2166,6 +2201,7 @@ class QuizManager {
     }
 
     renderComplete(container) {
+        localStorage.removeItem(this.storageKey);
         container.innerHTML = `
             <h3>🎉 Chúc mừng!</h3>
             <p>Bạn đã hoàn thành ${this.originalLength} câu hỏi gốc.</p>
