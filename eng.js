@@ -1939,49 +1939,50 @@ u48p3: [ // Tính từ
         { en: "printer", vi: "Máy in", ipa: "/ˈprɪn.tər/" },
         { en: "business trip", vi: "Chuyến công tác", ipa: "/ˈbɪz.nəs trɪp/" }
     ]
+    ,
+    // ===========================================
+    // DỮ LIỆU SỐ ĐẾM (UNIT 20)
+    // ===========================================
+    numbers: [
+        // 1-20
+        { en: "one", vi: "1", ipa: "/wʌn/" },
+        { en: "two", vi: "2", ipa: "/tuː/" },
+        { en: "three", vi: "3", ipa: "/θriː/" },
+        { en: "four", vi: "4", ipa: "/fɔː(r)/" },
+        { en: "five", vi: "5", ipa: "/faɪv/" },
+        { en: "six", vi: "6", ipa: "/sɪks/" },
+        { en: "seven", vi: "7", ipa: "/ˈsɛvn/" },
+        { en: "eight", vi: "8", ipa: "/eɪt/" },
+        { en: "nine", vi: "9", ipa: "/naɪn/" },
+        { en: "ten", vi: "10", ipa: "/tɛn/" },
+        { en: "eleven", vi: "11", ipa: "/ɪˈlɛvn/" },
+        { en: "twelve", vi: "12", ipa: "/twɛlv/" },
+        { en: "thirteen", vi: "13", ipa: "/θɜːˈtiːn/" },
+        { en: "fourteen", vi: "14", ipa: "/fɔːˈtiːn/" },
+        { en: "fifteen", vi: "15", ipa: "/fɪfˈtiːn/" },
+        { en: "sixteen", vi: "16", ipa: "/sɪksˈtiːn/" },
+        { en: "seventeen", vi: "17", ipa: "/sɛvnˈtiːn/" },
+        { en: "eighteen", vi: "18", ipa: "/eɪˈtiːn/" },
+        { en: "nineteen", vi: "19", ipa: "/naɪnˈtiːn/" },
+        { en: "twenty", vi: "20", ipa: "/ˈtwɛnti/" },
+        // Hàng chục
+        { en: "thirty", vi: "30", ipa: "/ˈθɜːti/" },
+        { en: "forty", vi: "40", ipa: "/ˈfɔːti/" },
+        { en: "fifty", vi: "50", ipa: "/ˈfɪfti/" },
+        { en: "sixty", vi: "60", ipa: "/ˈsɪksti/" },
+        { en: "seventy", vi: "70", ipa: "/ˈsɛvnti/" },
+        { en: "eighty", vi: "80", ipa: "/ˈeɪti/" },
+        { en: "ninety", vi: "90", ipa: "/ˈnaɪnti/" },
+        // Hàng lớn
+        { en: "one hundred", vi: "100", ipa: "/wʌn ˈhʌndrəd/" },
+        { en: "one hundred and one", vi: "101", ipa: "/wʌn ˈhʌndrəd ənd wʌn/" },
+        { en: "one thousand", vi: "1,000", ipa: "/wʌn ˈθaʊznd/" },
+        { en: "ten thousand", vi: "10,000", ipa: "/tɛn ˈθaʊznd/" },
+        { en: "one hundred thousand", vi: "100,000", ipa: "/wʌn ˈhʌndrəd ˈθaʊznd/" },
+        { en: "one million", vi: "1,000,000", ipa: "/wʌn ˈmɪljən/" },
+        { en: "one billion", vi: "1,000,000,000", ipa: "/wʌn ˈbɪljən/" }
+    ]
 };
-// ===========================================
-// DỮ LIỆU SỐ ĐẾM (UNIT 20)
-// ===========================================
-const numberData = [
-    // 1-20
-    { en: "one", vi: "1", ipa: "/wʌn/" },
-    { en: "two", vi: "2", ipa: "/tuː/" },
-    { en: "three", vi: "3", ipa: "/θriː/" },
-    { en: "four", vi: "4", ipa: "/fɔː(r)/" },
-    { en: "five", vi: "5", ipa: "/faɪv/" },
-    { en: "six", vi: "6", ipa: "/sɪks/" },
-    { en: "seven", vi: "7", ipa: "/ˈsɛvn/" },
-    { en: "eight", vi: "8", ipa: "/eɪt/" },
-    { en: "nine", vi: "9", ipa: "/naɪn/" },
-    { en: "ten", vi: "10", ipa: "/tɛn/" },
-    { en: "eleven", vi: "11", ipa: "/ɪˈlɛvn/" },
-    { en: "twelve", vi: "12", ipa: "/twɛlv/" },
-    { en: "thirteen", vi: "13", ipa: "/θɜːˈtiːn/" },
-    { en: "fourteen", vi: "14", ipa: "/fɔːˈtiːn/" },
-    { en: "fifteen", vi: "15", ipa: "/fɪfˈtiːn/" },
-    { en: "sixteen", vi: "16", ipa: "/sɪksˈtiːn/" },
-    { en: "seventeen", vi: "17", ipa: "/sɛvnˈtiːn/" },
-    { en: "eighteen", vi: "18", ipa: "/eɪˈtiːn/" },
-    { en: "nineteen", vi: "19", ipa: "/naɪnˈtiːn/" },
-    { en: "twenty", vi: "20", ipa: "/ˈtwɛnti/" },
-    // Hàng chục
-    { en: "thirty", vi: "30", ipa: "/ˈθɜːti/" },
-    { en: "forty", vi: "40", ipa: "/ˈfɔːti/" },
-    { en: "fifty", vi: "50", ipa: "/ˈfɪfti/" },
-    { en: "sixty", vi: "60", ipa: "/ˈsɪksti/" },
-    { en: "seventy", vi: "70", ipa: "/ˈsɛvnti/" },
-    { en: "eighty", vi: "80", ipa: "/ˈeɪti/" },
-    { en: "ninety", vi: "90", ipa: "/ˈnaɪnti/" },
-    // Hàng lớn
-    { en: "one hundred", vi: "100", ipa: "/wʌn ˈhʌndrəd/" },
-    { en: "one hundred and one", vi: "101", ipa: "/wʌn ˈhʌndrəd ənd wʌn/" },
-    { en: "one thousand", vi: "1,000", ipa: "/wʌn ˈθaʊznd/" },
-    { en: "ten thousand", vi: "10,000", ipa: "/tɛn ˈθaʊznd/" },
-    { en: "one hundred thousand", vi: "100,000", ipa: "/wʌn ˈhʌndrəd ˈθaʊznd/" },
-    { en: "one million", vi: "1,000,000", ipa: "/wʌn ˈmɪljən/" },
-    { en: "one billion", vi: "1,000,000,000", ipa: "/wʌn ˈbɪljən/" }
-];
 
 
 function shuffleArray(array) {
@@ -2120,6 +2121,7 @@ class QuizManager {
             <div class="quiz-controls">
                 <span class="quiz-status">Câu ${this.currentIndex + 1} / ${this.originalLength} | Cần ôn: ${this.mistakePile.length}</span>
                 <div>
+                    <button class="btn-reset" onclick="quizManagers['${this.containerId}'].reset()">Làm lại</button>
                     <button class="btn-5050" onclick="quizManagers['${this.containerId}'].useFiftyFifty()">50/50</button>
                     <button class="btn-next hidden" onclick="quizManagers['${this.containerId}'].next()">Câu tiếp</button>
                 </div>
@@ -2200,6 +2202,13 @@ class QuizManager {
         container.querySelector('.btn-5050').disabled = true;
     }
 
+    reset() {
+        if (confirm("Bạn có chắc chắn muốn làm lại từ đầu không? Toàn bộ tiến trình đã lưu sẽ bị xoá.")) {
+            localStorage.removeItem(this.storageKey);
+            this.initialize();
+        }
+    }
+
     renderComplete(container) {
         localStorage.removeItem(this.storageKey);
         container.innerHTML = `
@@ -2224,18 +2233,53 @@ const quizManagers = {};
 // KHỞI ĐỘNG
 // ===========================================
 document.addEventListener('DOMContentLoaded', () => {
-    // Khởi tạo quiz managers
-    quizManagers['master-quiz-container'] = new QuizManager('master-quiz-container', vocabularyData, 'word');
-    quizManagers['number-quiz-container'] = new QuizManager('number-quiz-container', numberData, 'number');
-    
-    quizManagers['master-quiz-container'].initialize();
-    quizManagers['number-quiz-container'].initialize();
+    const mainMenu = document.getElementById('main-menu');
+    const quizArea = document.getElementById('quiz-area');
+    const categoryButtons = document.querySelectorAll('.category-btn');
+    const backToMenuBtn = document.getElementById('back-to-menu-btn');
+
+    // Hàm để hiển thị quiz được chọn
+    function showQuiz(quizId) {
+        mainMenu.classList.add('hidden');
+        quizArea.classList.remove('hidden');
+
+        // Ẩn tất cả các section quiz
+        document.querySelectorAll('.unit-section').forEach(section => {
+            section.classList.add('hidden');
+        });
+
+        // Hiển thị section quiz tương ứng
+        const quizSectionId = quizId.replace('container', 'section');
+        document.getElementById(quizSectionId)?.classList.remove('hidden');
+
+        // Khởi tạo hoặc tải lại quiz
+        if (!quizManagers[quizId]) {
+            const type = quizId.includes('number') ? 'number' : 'word';
+            const data = type === 'number' ? vocabularyData.numbers : vocabularyData;
+            quizManagers[quizId] = new QuizManager(quizId, data, type);
+        }
+        quizManagers[quizId].initialize();
+    }
+
+    // Gán sự kiện cho các nút chọn category
+    categoryButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const quizId = button.getAttribute('data-quiz');
+            showQuiz(quizId);
+        });
+    });
 
     // Menu logic
     const body = document.body;
     const menuBtn = document.getElementById('menuBtn');
     const menuPanel = document.getElementById('menuPanel');
     const toggleBtn = document.getElementById('toggleBtn');
+
+    // Gán sự kiện cho nút quay lại menu
+    backToMenuBtn?.addEventListener('click', () => {
+        mainMenu.classList.remove('hidden');
+        quizArea.classList.add('hidden');
+    });
 
     menuBtn?.addEventListener('click', () => {
         menuBtn.classList.toggle('active');
