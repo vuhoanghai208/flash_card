@@ -15,19 +15,24 @@
         <div class="menu-panel" id="menuPanel"> 
             <div class="menu-label">Dark Mode</div> 
             <button class="toggle-btn" id="toggleBtn" aria-label="Toggle dark mode"></button> 
-        </div>
+            
+            <hr class="menu-divider">
+            <div class="menu-label">Giọng đọc (Voice)</div>
+            <select id="voiceSelectMenu" class="voice-select-menu">
+                <option value="auto">Đang tải giọng đọc...</option>
+            </select>
+            </div>
     </div>
     <header>
-        <h1>48 NGÀY LẤY GỐC TOÀN DIỆN TIẾNG ANH</h1>
-        <p>Biên soạn và giảng dạy: Cô Vũ Thị Mai Phương</p>
+        <h1>ENGLISH VOCABULARY</h1>
     </header>
 
     <main>
         <nav id="main-menu">
             <h2>CHỌN MỘT CHỦ ĐỀ ĐỂ BẮT ĐẦU</h2>
             <div class="menu-grid">
-                <button class="category-btn" data-quiz="master-quiz-container">Ôn tập từ vựng (All Units)</button>
-                <button class="category-btn" data-quiz="number-quiz-container">Ôn tập số đếm (Unit 20)</button>
+                <button class="category-btn" data-quiz="master-quiz-container">Ôn tập từ vựng</button>
+                <button class="category-btn" data-quiz="number-quiz-container">Ôn tập số</button>
             </div>
 
             <hr> 
@@ -60,6 +65,10 @@
     <div id="custom-modal-overlay" class="custom-modal-overlay hidden">
         <div id="custom-modal-box" class="custom-modal-box">
             <p id="custom-modal-message"></p>
+            
+            <div id="custom-modal-radios" class="custom-modal-radios hidden">
+                </div>
+            
             <input id="custom-modal-input" type="text" class="hidden">
             <div id="custom-modal-buttons">
                 <button id="custom-modal-btn-cancel">Cancel</button>
@@ -78,6 +87,7 @@
                 </div>
         </div>
     </div>
+    
     <script src="eng.js"></script>
 </body>
 </html>
