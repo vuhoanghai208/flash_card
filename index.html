@@ -6,9 +6,16 @@
     <title>Ôn tập tiếng anh-vocabulary.</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="light-mode"> <div class="menu-container"> <button class="menu-button" id="menuBtn" aria-label="Open menu"> <span></span> <span></span> <span></span> </button>
+<body class="light-mode"> 
+    <div class="menu-container"> 
+        <button class="menu-button" id="menuBtn" aria-label="Open menu"> 
+            <span></span> <span></span> <span></span> 
+        </button>
         
-        <div class="menu-panel" id="menuPanel"> <div class="menu-label">Dark Mode</div> <button class="toggle-btn" id="toggleBtn" aria-label="Toggle dark mode"></button> </div>
+        <div class="menu-panel" id="menuPanel"> 
+            <div class="menu-label">Dark Mode</div> 
+            <button class="toggle-btn" id="toggleBtn" aria-label="Toggle dark mode"></button> 
+        </div>
     </div>
     <header>
         <h1>48 NGÀY LẤY GỐC TOÀN DIỆN TIẾNG ANH</h1>
@@ -22,19 +29,55 @@
                 <button class="category-btn" data-quiz="master-quiz-container">Ôn tập từ vựng (All Units)</button>
                 <button class="category-btn" data-quiz="number-quiz-container">Ôn tập số đếm (Unit 20)</button>
             </div>
+
+            <hr> 
+
+            <div id="custom-library-section">
+                <h2>THƯ VIỆN CỦA TÔI</h2>
+                <div id="custom-library-grid" class="menu-grid">
+                    </div>
+                
+                <div class="menu-grid library-controls">
+                    <button id="create-library-btn" class="category-btn">Tạo thư viện mới (+)</button>
+                    <button id="manage-library-btn" class="category-btn btn-manage">Quản lý thư viện</button>
+                </div>
+            </div>
         </nav>
 
         <div id="quiz-area" class="hidden">
             <button id="back-to-menu-btn">&larr; Quay lại Menu</button>
-            <section id="master-quiz-section" class="unit-section hidden">
+            
+            <section id="master-quiz-container-section" class="unit-section hidden">
                 <div id="master-quiz-container" class="quiz-container"></div>
             </section>
-            <section id="number-quiz-section" class="unit-section hidden">
+            <section id="number-quiz-container-section" class="unit-section hidden">
                 <div id="number-quiz-container" class="quiz-container"></div>
             </section>
-        </div>
+
+            </div>
     </main>
 
+    <div id="custom-modal-overlay" class="custom-modal-overlay hidden">
+        <div id="custom-modal-box" class="custom-modal-box">
+            <p id="custom-modal-message"></p>
+            <input id="custom-modal-input" type="text" class="hidden">
+            <div id="custom-modal-buttons">
+                <button id="custom-modal-btn-cancel">Cancel</button>
+                <button id="custom-modal-btn-ok">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="manager-panel-overlay" class="manager-panel-overlay hidden">
+        <div class="manager-panel-box">
+            <div class="manager-panel-header">
+                <h2>Bảng Quản lý Thư viện</h2>
+                <button id="manager-panel-close-btn" class="close-btn">&times;</button>
+            </div>
+            <div id="manager-panel-list" class="manager-panel-list">
+                </div>
+        </div>
+    </div>
     <script src="eng.js"></script>
 </body>
 </html>
