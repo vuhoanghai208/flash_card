@@ -1983,8 +1983,111 @@ u48p3: [ // Tính từ
         { en: "one billion", vi: "1,000,000,000", ipa: "/wʌn ˈbɪljən/" }
     ]
 };
+// ===========================================
+// CUSTOM MODAL (HỘP THOẠI ĐẸP) (ĐÃ SỬA LỖI)
+// ===========================================
+class CustomModal {
+    constructor() {
+        this.overlay = document.getElementById('custom-modal-overlay');
+        this.modalBox = document.getElementById('custom-modal-box');
+        this.messageEl = document.getElementById('custom-modal-message');
+        this.inputEl = document.getElementById('custom-modal-input');
+        this.okBtn = document.getElementById('custom-modal-btn-ok');
+        this.cancelBtn = document.getElementById('custom-modal-btn-cancel');
+    }
 
+    show(message, options = {}) {
+        const { type = 'alert', defaultValue = '' } = options;
+        
+        this.messageEl.innerText = message;
+        
+        if (type === 'prompt') {
+            this.inputEl.classList.remove('hidden');
+            this.inputEl.value = defaultValue;
+            this.cancelBtn.classList.remove('hidden');
+        } else if (type === 'confirm') {
+            this.inputEl.classList.add('hidden');
+            this.cancelBtn.classList.remove('hidden');
+        } else { // 'alert'
+            this.inputEl.classList.add('hidden');
+            this.cancelBtn.classList.add('hidden');
+        }
 
+        this.overlay.classList.remove('hidden');
+        
+        if (type === 'prompt') {
+            this.inputEl.focus();
+            this.inputEl.select();
+        } else {
+            this.okBtn.focus();
+        }
+
+        // Xử lý phím Enter / Escape
+        const handleKeydown = (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                this.okBtn.click();
+            } else if (e.key === 'Escape') {
+                e.preventDefault();
+                this.cancelBtn.click();
+            }
+        };
+        document.addEventListener('keydown', handleKeydown);
+
+        return new Promise((resolve) => {
+            // Hàm dọn dẹp và giải quyết
+            const complete = (value) => {
+                document.removeEventListener('keydown', handleKeydown);
+                this.hide();
+                resolve(value);
+            };
+
+            this.okBtn.onclick = () => {
+                if (type === 'prompt') {
+                    complete(this.inputEl.value);
+                } else {
+                    complete(true); // 'confirm' or 'alert'
+                }
+            };
+
+            this.cancelBtn.onclick = () => {
+                if (type === 'prompt') {
+                    complete(null);
+                } else {
+                    complete(false); // 'confirm'
+                }
+            };
+
+            this.overlay.onclick = (e) => {
+                if (e.target === this.overlay) {
+                    this.cancelBtn.click(); // Kích hoạt logic "Cancel"
+                }
+            };
+        });
+    }
+
+    // Hàm hide() bây giờ CHỈ ẩn UI
+    hide() {
+        this.overlay.classList.add('hidden');
+        // Xóa các trình xử lý sự kiện để tránh gọi lại
+        this.okBtn.onclick = null;
+        this.cancelBtn.onclick = null;
+        this.overlay.onclick = null;
+    }
+
+    // Các hàm tiện ích (không đổi)
+    alert(message) {
+        return this.show(message, { type: 'alert' });
+    }
+    confirm(message) {
+        return this.show(message, { type: 'confirm' });
+    }
+    prompt(message, defaultValue = '') {
+        return this.show(message, { type: 'prompt', defaultValue });
+    }
+}
+// Khởi tạo một đối tượng modal toàn cục
+const MyModal = new CustomModal();
 function shuffleArray(array) {
     const newArray = [...array];
     for (let i = newArray.length - 1; i > 0; i--) {
@@ -2001,7 +2104,7 @@ function speakText(event, text) {
         utterance.lang = 'en-US';
         window.speechSynthesis.speak(utterance);
     } else {
-        alert('Trình duyệt không hỗ trợ API phát âm.');
+        MyModal.alert('Trình duyệt không hỗ trợ API phát âm.');
     }
 }
 
@@ -2014,13 +2117,13 @@ function translateText(event, text) {
 }
 
 // ===========================================
-// QUIZ CLASS (Tối ưu - Dùng chung cho cả 2 quiz)
+// QUIZ CLASS
 // ===========================================
 class QuizManager {
     constructor(containerId, data, type = 'word') {
-        this.containerId = containerId;
+        this.containerId = containerId; // e.g., "master-quiz-container" or "lib-My-List-1"
         this.data = data;
-        this.type = type;
+        this.type = type; // 'word', 'number', or 'custom'
         this.currentIndex = 0;
         this.correctCount = 0;
         this.incorrectCount = 0;
@@ -2041,12 +2144,19 @@ class QuizManager {
         this.newCorrectCounter = 0;
 
         if (!this.loadState()) {
-            // Tối ưu: Dùng Set thay vì filter
-            this.shuffledDeck = shuffleArray(
-                this.type === 'word' ? Object.values(this.data).flat() : this.data
-            );
+            if (this.type === 'word') {
+                this.shuffledDeck = shuffleArray(Object.values(this.data).filter(Array.isArray).flat());
+            } else { 
+                this.shuffledDeck = shuffleArray(this.data);
+            }
             this.originalLength = this.shuffledDeck.length;
-            this.allOptions = [...new Set(this.shuffledDeck.map(item => item.vi).filter(Boolean))];
+            
+             this.allOptions = [...new Set(
+                shuffleArray(Object.values(vocabularyData).filter(Array.isArray).flat())
+                .map(item => item.vi)
+                .filter(Boolean) 
+            )];
+            
             this.render();
         }
     }
@@ -2075,7 +2185,12 @@ class QuizManager {
             this.newCorrectCounter = state.newCorrectCounter;
             this.shuffledDeck = state.shuffledDeck;
             this.originalLength = state.originalLength;
-            this.allOptions = [...new Set(this.shuffledDeck.map(item => item.vi).filter(Boolean))];
+            
+            this.allOptions = [...new Set(
+                shuffleArray(Object.values(vocabularyData).filter(Array.isArray).flat())
+                .map(item => item.vi)
+                .filter(Boolean)
+            )];
             this.render();
             return true;
         }
@@ -2094,10 +2209,8 @@ class QuizManager {
         const current = this.shuffledDeck[this.currentIndex];
         const correctAnswer = current.vi;
         
-        // Tạo options
         const incorrectOptions = this.allOptions
             .filter(opt => opt !== correctAnswer)
-            .sort(() => 0.5 - Math.random())
             .slice(0, 3);
         
         const options = shuffleArray([correctAnswer, ...incorrectOptions]);
@@ -2158,7 +2271,6 @@ class QuizManager {
             feedback.textContent = 'Chính xác!';
             feedback.className = 'quiz-feedback correct';
             
-            // Clear timeout cũ nếu có
             if (this.timeoutId) clearTimeout(this.timeoutId);
             this.timeoutId = setTimeout(() => this.next(), 1000);
         } else {
@@ -2189,7 +2301,6 @@ class QuizManager {
         }
 
         this.render();
-
         this.saveState();
     }
 
@@ -2202,15 +2313,24 @@ class QuizManager {
         container.querySelector('.btn-5050').disabled = true;
     }
 
-    reset() {
-        if (confirm("Bạn có chắc chắn muốn làm lại từ đầu không? Toàn bộ tiến trình đã lưu sẽ bị xoá.")) {
+    async reset() {
+        const confirmed = await MyModal.confirm("Bạn có chắc chắn muốn làm lại từ đầu không? Toàn bộ tiến trình đã lưu sẽ bị xoá.");
+        if (confirmed) {
             localStorage.removeItem(this.storageKey);
             this.initialize();
         }
     }
 
     renderComplete(container) {
-        localStorage.removeItem(this.storageKey);
+        localStorage.removeItem(this.storageKey); 
+        
+        let buttons = `<button class="btn-next" onclick="quizManagers['${this.containerId}'].initialize()">Làm lại</button>`;
+        
+        if (this.type === 'custom') {
+            buttons += `<button class="btn-next" onclick="quizManagers['${this.containerId}'].extendLibrary()">Thêm từ mới</button>`;
+            buttons += `<button class="btn-reset" onclick="quizManagers['${this.containerId}'].deleteLibrary()">Xoá thư viện</button>`;
+        }
+
         container.innerHTML = `
             <h3>🎉 Chúc mừng!</h3>
             <p>Bạn đã hoàn thành ${this.originalLength} câu hỏi gốc.</p>
@@ -2219,8 +2339,61 @@ class QuizManager {
                 <span class="correct-score">${this.correctCount} Lượt Đúng</span> / 
                 <span class="incorrect-score">${this.incorrectCount} Lượt Sai</span>
             </p>
-            <button class="btn-next" onclick="quizManagers['${this.containerId}'].initialize()">Làm lại</button>
+            ${buttons}
         `;
+    }
+
+    async extendLibrary() {
+        if (this.type !== 'custom') return;
+
+        const libName = document.getElementById(`${this.containerId}-title`).textContent;
+        const libraries = JSON.parse(localStorage.getItem('myLibraries'));
+        let currentLibrary = libraries[libName] || [];
+        
+        const numStr = await MyModal.prompt(`Thư viện "${libName}" hiện có ${currentLibrary.length} từ.\nBạn muốn thêm bao nhiêu từ mới?`, "10");
+        if (numStr === null || isNaN(numStr) || parseInt(numStr) <= 0) return;
+        
+        const numToAdd = parseInt(numStr);
+        
+        let fullPool = [];
+        for (const key in vocabularyData) {
+            if (key !== 'numbers' && Array.isArray(vocabularyData[key])) {
+                fullPool = fullPool.concat(vocabularyData[key]);
+            }
+        }
+        const uniquePool = [...new Map(fullPool.map(item => [item['en'], item])).values()];
+        
+        const currentWordsSet = new Set(currentLibrary.map(item => item.en));
+        const availablePool = uniquePool.filter(item => !currentWordsSet.has(item.en));
+        
+        if (availablePool.length === 0) {
+            MyModal.alert("Bạn đã học hết tất cả từ vựng trong kho!");
+            return;
+        }
+        
+        const wordsToGet = Math.min(numToAdd, availablePool.length);
+        const newWords = shuffleArray(availablePool).slice(0, wordsToGet);
+        
+        const updatedLibrary = currentLibrary.concat(newWords);
+        libraries[libName] = updatedLibrary;
+        localStorage.setItem('myLibraries', JSON.stringify(libraries));
+        
+        MyModal.alert(`Đã thêm ${wordsToGet} từ mới vào "${libName}".\nTổng số: ${updatedLibrary.length} từ.`);
+        
+        this.data = updatedLibrary;
+        this.initialize();
+    }
+
+    async deleteLibrary() {
+        if (this.type !== 'custom') return;
+        
+        const libName = document.getElementById(`${this.containerId}-title`).textContent;
+        const success = await deleteLibrary(libName);
+        
+        if (success) {
+            document.getElementById('main-menu').classList.remove('hidden');
+            document.getElementById('quiz-area').classList.add('hidden');
+        }
     }
 }
 
@@ -2230,38 +2403,221 @@ class QuizManager {
 const quizManagers = {};
 
 // ===========================================
+// HÀM QUẢN LÝ THƯ VIỆN (TÁI CẤU TRÚC)
+// ===========================================
+
+async function deleteLibrary(libName) {
+    const confirmed = await MyModal.confirm(`Bạn có chắc chắn muốn XOÁ vĩnh viễn thư viện "${libName}" không?`);
+        
+    if (!confirmed) {
+        return false; 
+    }
+    
+    const libraries = JSON.parse(localStorage.getItem('myLibraries') || '{}');
+    delete libraries[libName];
+    localStorage.setItem('myLibraries', JSON.stringify(libraries));
+    
+    const quizId = 'lib-' + libName.replace(/\s+/g, '-');
+    delete quizManagers[quizId];
+    
+    document.getElementById(quizId + '-section')?.remove();
+    document.querySelector(`[data-lib-name="${libName}"]`)?.remove();
+    
+    return true; 
+}
+
+
+function loadMyLibraries() {
+    const libraries = JSON.parse(localStorage.getItem('myLibraries') || '{}');
+    const grid = document.getElementById('custom-library-grid');
+    grid.innerHTML = ''; 
+    
+    for (const libName in libraries) {
+        const btn = document.createElement('button');
+        btn.className = 'category-btn';
+        btn.textContent = libName;
+        const quizId = 'lib-' + libName.replace(/\s+/g, '-'); 
+        btn.setAttribute('data-quiz', quizId);
+        btn.setAttribute('data-lib-name', libName); 
+        
+        btn.addEventListener('click', () => {
+            showQuiz(quizId);
+        });
+
+        grid.appendChild(btn);
+        
+        createQuizSection(quizId, libName);
+    }
+}
+
+function createQuizSection(quizId, libName) {
+    const quizArea = document.getElementById('quiz-area');
+    if (document.getElementById(quizId + '-section')) return;
+    
+    const section = document.createElement('section');
+    section.id = quizId + '-section';
+    section.className = 'unit-section hidden';
+    
+    section.innerHTML = `
+        <h2 id="${quizId}-title">${libName}</h2>
+        <div id="${quizId}" class="quiz-container"></div>
+    `;
+    quizArea.appendChild(section);
+}
+
+
+async function createNewLibrary() {
+    const libName = await MyModal.prompt("Nhập tên thư viện của bạn:", "Bài học 1");
+    if (libName === null || libName.trim() === '') return; 
+
+    const libraries = JSON.parse(localStorage.getItem('myLibraries') || '{}');
+    if (libraries[libName]) {
+        MyModal.alert("Tên thư viện này đã tồn tại!");
+        return;
+    }
+    
+    const numStr = await MyModal.prompt("Bạn muốn học bao nhiêu từ?", "20");
+    if (numStr === null || isNaN(numStr) || parseInt(numStr) <= 0) return;
+    let numWords = parseInt(numStr);
+
+    let fullPool = [];
+    for (const key in vocabularyData) {
+        if (key !== 'numbers' && Array.isArray(vocabularyData[key])) {
+            fullPool = fullPool.concat(vocabularyData[key]);
+        }
+    }
+    const uniquePool = [...new Map(fullPool.map(item => [item['en'], item])).values()];
+    let shuffledPool = shuffleArray(uniquePool);
+    
+    if (numWords > shuffledPool.length) {
+        MyModal.alert(`Chỉ có ${shuffledPool.length} từ trong kho.\nĐã tạo thư viện với ${shuffledPool.length} từ.`);
+        numWords = shuffledPool.length;
+    }
+    
+    const newLibraryWords = shuffledPool.slice(0, numWords);
+    
+    libraries[libName] = newLibraryWords;
+    localStorage.setItem('myLibraries', JSON.stringify(libraries));
+    
+    loadMyLibraries();
+    MyModal.alert(`Đã tạo thư viện "${libName}" với ${numWords} từ.`);
+}
+
+// ===========================================
+// LOGIC BẢNG QUẢN LÝ (MỚI)
+// ===========================================
+function openLibraryManager() {
+    const listContainer = document.getElementById('manager-panel-list');
+    const panel = document.getElementById('manager-panel-overlay');
+    listContainer.innerHTML = ''; 
+    
+    const libraries = JSON.parse(localStorage.getItem('myLibraries') || '{}');
+    const libNames = Object.keys(libraries);
+    
+    if (libNames.length === 0) {
+        listContainer.innerHTML = '<p style="text-align: center;">Bạn chưa có thư viện nào.</p>';
+    } else {
+        libNames.forEach(libName => {
+            const words = libraries[libName];
+            const wordCount = words.length;
+
+            const item = document.createElement('div');
+            item.className = 'manager-panel-item';
+            
+            item.innerHTML = `
+                <span class="manager-panel-item-name">${libName} (${wordCount} từ)</span>
+                <div class="manager-panel-item-actions">
+                    <button class="btn-view-lib">Xem</button>
+                    <button class="btn-delete-lib">Xóa</button>
+                </div>
+            `;
+            
+            item.querySelector('.btn-view-lib').addEventListener('click', () => {
+                viewLibraryWords(libName, words);
+            });
+            
+            item.querySelector('.btn-delete-lib').addEventListener('click', async () => {
+                const success = await deleteLibrary(libName);
+                if (success) {
+                    openLibraryManager();
+                }
+            });
+            
+            listContainer.appendChild(item);
+        });
+    }
+    
+    panel.classList.remove('hidden');
+}
+
+function viewLibraryWords(libName, wordsArray) {
+    if (!wordsArray) { 
+        const libraries = JSON.parse(localStorage.getItem('myLibraries') || '{}');
+        wordsArray = libraries[libName] || [];
+    }
+    
+    const formattedString = wordsArray
+        .map((word, i) => `${i + 1}. ${word.en}: ${word.vi}`)
+        .join('\n');
+        
+    const message = `Danh sách từ trong "${libName}":\n\n${formattedString}`;
+    
+    MyModal.alert(message);
+}
+
+
+// ===========================================
 // KHỞI ĐỘNG
 // ===========================================
 document.addEventListener('DOMContentLoaded', () => {
     const mainMenu = document.getElementById('main-menu');
     const quizArea = document.getElementById('quiz-area');
-    const categoryButtons = document.querySelectorAll('.category-btn');
+    const categoryButtons = document.querySelectorAll('.category-btn[data-quiz]');
     const backToMenuBtn = document.getElementById('back-to-menu-btn');
 
-    // Hàm để hiển thị quiz được chọn
-    function showQuiz(quizId) {
+    window.showQuiz = function(quizId) {
         mainMenu.classList.add('hidden');
         quizArea.classList.remove('hidden');
 
-        // Ẩn tất cả các section quiz
         document.querySelectorAll('.unit-section').forEach(section => {
             section.classList.add('hidden');
         });
 
-        // Hiển thị section quiz tương ứng
-        const quizSectionId = quizId.replace('container', 'section');
+        const quizSectionId = quizId + '-section';
         document.getElementById(quizSectionId)?.classList.remove('hidden');
 
-        // Khởi tạo hoặc tải lại quiz
         if (!quizManagers[quizId]) {
-            const type = quizId.includes('number') ? 'number' : 'word';
-            const data = type === 'number' ? vocabularyData.numbers : vocabularyData;
-            quizManagers[quizId] = new QuizManager(quizId, data, type);
+            let data, type;
+            if (quizId.startsWith('lib-')) {
+                const libName = document.querySelector(`[data-quiz="${quizId}"]`).dataset.libName;
+                const libraries = JSON.parse(localStorage.getItem('myLibraries'));
+                data = libraries[libName];
+                type = 'custom';
+            } else if (quizId === 'number-quiz-container') {
+                data = vocabularyData.numbers;
+                type = 'number';
+            } else { // master-quiz-container
+                data = vocabularyData;
+                type = 'word';
+            }
+            
+            if (data) { 
+                quizManagers[quizId] = new QuizManager(quizId, data, type);
+                quizManagers[quizId].initialize();
+            } else {
+                MyModal.alert("Lỗi: Không tìm thấy dữ liệu cho thư viện này. (Có thể đã bị xóa)");
+                showMainMenu(); 
+            }
+        } else {
+             quizManagers[quizId].initialize();
         }
-        quizManagers[quizId].initialize();
+    }
+    
+    function showMainMenu() {
+        mainMenu.classList.remove('hidden');
+        quizArea.classList.add('hidden');
     }
 
-    // Gán sự kiện cho các nút chọn category
     categoryButtons.forEach(button => {
         button.addEventListener('click', () => {
             const quizId = button.getAttribute('data-quiz');
@@ -2269,17 +2625,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Menu logic
+    loadMyLibraries();
+
+    document.getElementById('create-library-btn').addEventListener('click', createNewLibrary);
+
+    backToMenuBtn?.addEventListener('click', showMainMenu);
+
+    // --- Logic Menu (Dark Mode) ---
     const body = document.body;
     const menuBtn = document.getElementById('menuBtn');
     const menuPanel = document.getElementById('menuPanel');
     const toggleBtn = document.getElementById('toggleBtn');
-
-    // Gán sự kiện cho nút quay lại menu
-    backToMenuBtn?.addEventListener('click', () => {
-        mainMenu.classList.remove('hidden');
-        quizArea.classList.add('hidden');
-    });
 
     menuBtn?.addEventListener('click', () => {
         menuBtn.classList.toggle('active');
@@ -2298,5 +2654,22 @@ document.addEventListener('DOMContentLoaded', () => {
         body.classList.toggle('light-mode', isDark);
         body.classList.toggle('dark-mode', !isDark);
         localStorage.setItem('theme', isDark ? 'light' : 'dark');
+    });
+    
+    // --- SỰ KIỆN CHO BẢNG QUẢN LÝ (MỚI) ---
+    const managerPanel = document.getElementById('manager-panel-overlay');
+    const manageBtn = document.getElementById('manage-library-btn');
+    const closeManageBtn = document.getElementById('manager-panel-close-btn');
+    
+    manageBtn.addEventListener('click', openLibraryManager);
+    
+    closeManageBtn.addEventListener('click', () => {
+        managerPanel.classList.add('hidden');
+    });
+    
+    managerPanel.addEventListener('click', (e) => {
+        if (e.target === managerPanel) {
+            managerPanel.classList.add('hidden');
+        }
     });
 });
