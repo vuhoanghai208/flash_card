@@ -609,6 +609,40 @@ body.dark-mode .unit-section h2 {
     white-space: pre-wrap; /* Cho phép xuống dòng */
 }
 
+/* === CSS MỚI CHO RADIO BUTTON === */
+.custom-modal-radios {
+    margin-bottom: 25px;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+    padding: 10px 0;
+}
+
+.custom-modal-radios .radio-option {
+    display: block;
+    padding: 12px 10px;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+}
+
+.custom-modal-radios .radio-option:hover {
+    background-color: #f4f4f9;
+}
+
+.custom-modal-radios .radio-option input {
+    margin-right: 12px;
+    cursor: pointer;
+    /* Làm cho radio button lớn hơn một chút */
+    transform: scale(1.1); 
+}
+
+.custom-modal-radios .radio-option label {
+    cursor: pointer;
+    font-weight: bold;
+    color: #333;
+}
+/* === KẾT THÚC CSS MỚI === */
+
 #custom-modal-input {
     width: 100%;
     padding: 12px;
@@ -671,6 +705,19 @@ body.dark-mode #custom-modal-input {
     border-color: #777;
     color: #f0f0f0;
 }
+
+/* === DARK MODE MỚI CHO RADIO === */
+body.dark-mode .custom-modal-radios {
+    border-color: #4a4a4a;
+}
+body.dark-mode .custom-modal-radios .radio-option:hover {
+    background-color: #4a5568;
+}
+body.dark-mode .custom-modal-radios .radio-option label {
+    color: #e0e0e0;
+}
+/* === KẾT THÚC DARK MODE MỚI === */
+
 body.dark-mode #custom-modal-btn-cancel {
     background-color: #4a5568;
     border-color: #777;
@@ -860,4 +907,33 @@ body.dark-mode .close-btn {
 }
 body.dark-mode .close-btn:hover {
     color: #fff;
+}
+/* ... (sau khối body.dark-mode .toggle-btn::before) ... */
+
+/* === CSS MỚI CHO MENU GIỌNG ĐỌC === */
+.menu-divider {
+    border: none;
+    border-top: 1px solid #e0e0e0;
+    margin: 15px 0;
+}
+
+.voice-select-menu {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+    font-size: 14px;
+    cursor: pointer;
+    margin-top: 5px; /* Thêm một chút khoảng cách */
+}
+
+body.dark-mode .menu-divider {
+    border-top-color: #4a4a4a;
+}
+
+body.dark-mode .voice-select-menu {
+    background-color: #4a5568;
+    border-color: #777;
+    color: #f0f0f0;
 }
