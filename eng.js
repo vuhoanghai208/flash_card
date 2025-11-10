@@ -2511,6 +2511,9 @@ u48p3: [ // Tính từ
         { en: "one billion", vi: "1,000,000,000", ipa: "/wʌn ˈbɪljən/" }
     ]
 };
+// Biến toàn cục để giữ danh sách giọng đọc
+let availableVoices = []; 
+
 // ===========================================
 // CUSTOM MODAL (HỘP THOẠI ĐẸP) (ĐÃ SỬA LỖI)
 // ===========================================
@@ -2520,24 +2523,41 @@ class CustomModal {
         this.modalBox = document.getElementById('custom-modal-box');
         this.messageEl = document.getElementById('custom-modal-message');
         this.inputEl = document.getElementById('custom-modal-input');
+        this.radiosEl = document.getElementById('custom-modal-radios'); // MỚI
         this.okBtn = document.getElementById('custom-modal-btn-ok');
         this.cancelBtn = document.getElementById('custom-modal-btn-cancel');
     }
 
     show(message, options = {}) {
-        const { type = 'alert', defaultValue = '' } = options;
+        // CẬP NHẬT: Thêm radioOptions
+        const { type = 'alert', defaultValue = '', radioOptions = [] } = options;
         
         this.messageEl.innerText = message;
+
+        // CẬP NHẬT: Reset tất cả các thành phần
+        this.inputEl.classList.add('hidden');
+        this.radiosEl.classList.add('hidden');
+        this.radiosEl.innerHTML = '';
         
         if (type === 'prompt') {
             this.inputEl.classList.remove('hidden');
             this.inputEl.value = defaultValue;
             this.cancelBtn.classList.remove('hidden');
         } else if (type === 'confirm') {
-            this.inputEl.classList.add('hidden');
+            this.cancelBtn.classList.remove('hidden');
+        } else if (type === 'radio') { // MỚI: Xử lý loại radio
+            radioOptions.forEach((opt, index) => {
+                const checked = index === 0 ? 'checked' : ''; // Tự động chọn cái đầu tiên
+                this.radiosEl.innerHTML += `
+                    <span class="radio-option">
+                        <input type="radio" id="modal-radio-${opt.value}" name="modal-radio" value="${opt.value}" ${checked}>
+                        <label for="modal-radio-${opt.value}">${opt.text}</label>
+                    </span>
+                `;
+            });
+            this.radiosEl.classList.remove('hidden');
             this.cancelBtn.classList.remove('hidden');
         } else { // 'alert'
-            this.inputEl.classList.add('hidden');
             this.cancelBtn.classList.add('hidden');
         }
 
@@ -2573,6 +2593,9 @@ class CustomModal {
             this.okBtn.onclick = () => {
                 if (type === 'prompt') {
                     complete(this.inputEl.value);
+                } else if (type === 'radio') { // MỚI: Lấy giá trị radio
+                    const checkedRadio = this.radiosEl.querySelector('input[name="modal-radio"]:checked');
+                    complete(checkedRadio ? checkedRadio.value : null);
                 } else {
                     complete(true); // 'confirm' or 'alert'
                 }
@@ -2581,6 +2604,8 @@ class CustomModal {
             this.cancelBtn.onclick = () => {
                 if (type === 'prompt') {
                     complete(null);
+                } else if (type === 'radio') { // MỚI
+                    complete(null); // Hủy radio cũng trả về null
                 } else {
                     complete(false); // 'confirm'
                 }
@@ -2597,6 +2622,10 @@ class CustomModal {
     // Hàm hide() bây giờ CHỈ ẩn UI
     hide() {
         this.overlay.classList.add('hidden');
+        // CẬP NHẬT: Ẩn cả radios
+        this.radiosEl.classList.add('hidden');
+        this.inputEl.classList.add('hidden');
+
         // Xóa các trình xử lý sự kiện để tránh gọi lại
         this.okBtn.onclick = null;
         this.cancelBtn.onclick = null;
@@ -2612,6 +2641,11 @@ class CustomModal {
     }
     prompt(message, defaultValue = '') {
         return this.show(message, { type: 'prompt', defaultValue });
+    }
+
+    // MỚI: Hàm tiện ích cho radio
+    radio(message, radioOptions) {
+        return this.show(message, { type: 'radio', radioOptions });
     }
 }
 // Khởi tạo một đối tượng modal toàn cục
@@ -2630,6 +2664,19 @@ function speakText(event, text) {
     if ('speechSynthesis' in window) {
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'en-US';
+
+        // === LOGIC CHỌN GIỌNG ĐỌC MỚI ===
+        const selectedVoiceURI = localStorage.getItem('selectedVoiceURI');
+        if (selectedVoiceURI && selectedVoiceURI !== 'auto') {
+            // Tìm giọng đọc đã lưu trong danh sách toàn cục
+            const selectedVoice = availableVoices.find(voice => voice.voiceURI === selectedVoiceURI);
+            if (selectedVoice) {
+                utterance.voice = selectedVoice;
+            }
+        }
+        // Nếu là 'auto' hoặc không tìm thấy, trình duyệt sẽ tự chọn giọng mặc định
+        // === KẾT THÚC LOGIC MỚI ===
+
         window.speechSynthesis.speak(utterance);
     } else {
         MyModal.alert('Trình duyệt không hỗ trợ API phát âm.');
@@ -2642,6 +2689,41 @@ function translateText(event, text) {
     const url = `https://translate.google.com/?sl=auto&tl=vi&text=${encodedText}&op=translate`;
     const features = `width=600,height=700,left=${(screen.width-600)/2},top=${(screen.height-700)/2},resizable=yes,scrollbars=yes`;
     window.open(url, 'googleTranslatePopup', features);
+}
+
+/**
+ * Tải và hiển thị danh sách giọng đọc tiếng Anh
+ * vào menu thả xuống.
+ */
+function populateVoiceList() {
+    // Lấy danh sách giọng đọc. Lọc chỉ giữ lại tiếng Anh (en)
+    availableVoices = speechSynthesis.getVoices().filter(voice => voice.lang.startsWith('en-'));
+    
+    const voiceSelectMenu = document.getElementById('voiceSelectMenu');
+    if (!voiceSelectMenu) return; // Thoát nếu không tìm thấy menu
+
+    const savedVoiceURI = localStorage.getItem('selectedVoiceURI') || 'auto';
+    voiceSelectMenu.innerHTML = ''; // Xóa các tùy chọn cũ (như "Đang tải...")
+
+    // 1. Thêm tùy chọn "Tự động" (Mặc định)
+    const defaultOption = document.createElement('option');
+    defaultOption.value = 'auto';
+    defaultOption.textContent = 'Tự động (Default)';
+    voiceSelectMenu.appendChild(defaultOption);
+
+    // 2. Thêm các giọng đọc tiếng Anh tìm thấy
+    availableVoices.forEach(voice => {
+        const option = document.createElement('option');
+        option.value = voice.voiceURI;
+        // Hiển thị tên giọng đọc, ví dụ: "Google US English (en-US)"
+        option.textContent = `${voice.name} (${voice.lang})`;
+        
+        // Nếu giọng này là giọng đã lưu, chọn nó
+        if (voice.voiceURI === savedVoiceURI) {
+            option.selected = true;
+        }
+        voiceSelectMenu.appendChild(option);
+    });
 }
 
 // ===========================================
@@ -2659,7 +2741,9 @@ class QuizManager {
         this.newCorrectCounter = 0;
         this.shuffledDeck = [];
         this.originalLength = 0;
-        this.allOptions = [];
+        //this.allOptions = []; // Sẽ được thay thế bằng 2 pool dưới
+        this.vocabOptionPool = [];
+        this.numberOptionPool = [];
         this.storageKey = `quizState_${this.containerId}`;
         this.timeoutId = null;
     }
@@ -2671,6 +2755,21 @@ class QuizManager {
         this.mistakePile = [];
         this.newCorrectCounter = 0;
 
+        // === CẬP NHẬT: TẠO KHO TÙY CHỌN RIÊNG BIỆT ===
+        // Tạo kho từ vựng
+        const vocabPool = [];
+        for (const key in vocabularyData) {
+            if (key !== 'numbers' && Array.isArray(vocabularyData[key])) {
+                vocabPool.push(...vocabularyData[key]);
+            }
+        }
+        this.vocabOptionPool = [...new Set(vocabPool.map(item => item.vi).filter(Boolean))];
+
+        // Tạo kho số
+        const numberPool = vocabularyData.numbers || [];
+        this.numberOptionPool = [...new Set(numberPool.map(item => item.vi).filter(Boolean))];
+        // === KẾT THÚC CẬP NHẬT ===
+
         if (!this.loadState()) {
             if (this.type === 'word') {
                 this.shuffledDeck = shuffleArray(Object.values(this.data).filter(Array.isArray).flat());
@@ -2678,12 +2777,6 @@ class QuizManager {
                 this.shuffledDeck = shuffleArray(this.data);
             }
             this.originalLength = this.shuffledDeck.length;
-            
-             this.allOptions = [...new Set(
-                shuffleArray(Object.values(vocabularyData).filter(Array.isArray).flat())
-                .map(item => item.vi)
-                .filter(Boolean) 
-            )];
             
             this.render();
         }
@@ -2704,6 +2797,22 @@ class QuizManager {
 
     loadState() {
         const savedState = localStorage.getItem(this.storageKey);
+
+        // === CẬP NHẬT: TẠO KHO TÙY CHỌN RIÊNG BIỆT (PHẢI CÓ TRONG CẢ LOADSTATE) ===
+        // Tạo kho từ vựng
+        const vocabPool = [];
+        for (const key in vocabularyData) {
+            if (key !== 'numbers' && Array.isArray(vocabularyData[key])) {
+                vocabPool.push(...vocabularyData[key]);
+            }
+        }
+        this.vocabOptionPool = [...new Set(vocabPool.map(item => item.vi).filter(Boolean))];
+
+        // Tạo kho số
+        const numberPool = vocabularyData.numbers || [];
+        this.numberOptionPool = [...new Set(numberPool.map(item => item.vi).filter(Boolean))];
+        // === KẾT THÚC CẬP NHẬT ===
+
         if (savedState) {
             const state = JSON.parse(savedState);
             this.currentIndex = state.currentIndex;
@@ -2714,11 +2823,6 @@ class QuizManager {
             this.shuffledDeck = state.shuffledDeck;
             this.originalLength = state.originalLength;
             
-            this.allOptions = [...new Set(
-                shuffleArray(Object.values(vocabularyData).filter(Array.isArray).flat())
-                .map(item => item.vi)
-                .filter(Boolean)
-            )];
             this.render();
             return true;
         }
@@ -2735,12 +2839,36 @@ class QuizManager {
         }
 
         const current = this.shuffledDeck[this.currentIndex];
-        const correctAnswer = current.vi;
+        const correctAnswer = current.vi; // e.g., "thừa kế"
         
-        const incorrectOptions = this.allOptions
-            .filter(opt => opt !== correctAnswer)
-            .slice(0, 3);
+        // === SỬA LỖI LOGIC TẠI ĐÂY (NÂNG CẤP) ===
+
+        let incorrectOptionPool;
+
+        // 1. Kiểm tra xem câu hỏi này là SỐ hay TỪ VỰNG
+        // Bằng cách xem đáp án đúng của nó có nằm trong kho số không
+        const isNumber = this.numberOptionPool.includes(correctAnswer);
+
+        if (isNumber) {
+            // Nếu là SỐ, kho đáp án sai PHẢI là kho SỐ
+            incorrectOptionPool = this.numberOptionPool;
+        } else {
+            // Nếu là TỪ VỰNG, kho đáp án sai PHẢI là kho TỪ VỰNG
+            incorrectOptionPool = this.vocabOptionPool;
+        }
+
+        // 2. Lọc ra TẤT CẢ các đáp án sai (loại bỏ đáp án đúng) từ kho ĐÃ CHỌN
+        const allIncorrectOptions = incorrectOptionPool.filter(opt => opt !== correctAnswer);
         
+        // 3. XÁO TRỘN danh sách các đáp án sai đó
+        const shuffledIncorrectPool = shuffleArray(allIncorrectOptions);
+        
+        // 4. Lấy 3 đáp án sai ngẫu nhiên từ danh sách đã xáo trộn
+        const incorrectOptions = shuffledIncorrectPool.slice(0, 3);
+        
+        // === KẾT THÚC SỬA LỖI ===
+        
+        // 5. Gộp đáp án đúng và 3 đáp án sai, sau đó xáo trộn lần cuối để ra A,B,C,D
         const options = shuffleArray([correctAnswer, ...incorrectOptions]);
         const prefixes = ['A', 'B', 'C', 'D'];
 
@@ -2946,6 +3074,12 @@ async function deleteLibrary(libName) {
     localStorage.setItem('myLibraries', JSON.stringify(libraries));
     
     const quizId = 'lib-' + libName.replace(/\s+/g, '-');
+
+    // === DÒNG SỬA LỖI MỚI (THÊM VÀO ĐÂY) ===
+    // Xóa file lưu tiến trình của quiz cũ
+    localStorage.removeItem(`quizState_${quizId}`);
+    // ========================================
+    
     delete quizManagers[quizId];
     
     document.getElementById(quizId + '-section')?.remove();
@@ -3004,21 +3138,66 @@ async function createNewLibrary() {
         return;
     }
     
+    // === PHẦN SỬA ĐỔI: SỬ DỤNG RADIO THAY VÌ CONFIRM ===
+    
+    // 1. Định nghĩa các lựa chọn radio
+    const radioOptions = [
+        { value: 'vocab', text: 'Chỉ \'Ôn tập từ vựng\' (Tất cả bài học)' },
+        { value: 'numbers', text: 'Chỉ \'Ôn tập số\'' },
+        { value: 'both', text: 'Bao gồm cả hai nguồn trên' }
+    ];
+
+    // 2. Hiển thị modal radio
+    const selection = await MyModal.radio("Chọn nguồn từ vựng để tạo thư viện:", radioOptions);
+
+    // 3. Xử lý nếu người dùng bấm "Cancel"
+    if (selection === null) {
+        MyModal.alert("Đã hủy tạo thư viện.");
+        return;
+    }
+
+    // 4. Xây dựng nguồn từ vựng (fullPool) dựa trên lựa chọn
+    let fullPool = [];
+    switch (selection) {
+        case 'vocab':
+            for (const key in vocabularyData) {
+                if (key !== 'numbers' && Array.isArray(vocabularyData[key])) {
+                    fullPool = fullPool.concat(vocabularyData[key]);
+                }
+            }
+            break;
+        case 'numbers':
+            if (vocabularyData.numbers && Array.isArray(vocabularyData[numbers])) {
+                fullPool = fullPool.concat(vocabularyData.numbers);
+            }
+            break;
+        case 'both':
+            for (const key in vocabularyData) {
+                if (Array.isArray(vocabularyData[key])) { // Lấy tất cả, kể cả 'numbers'
+                    fullPool = fullPool.concat(vocabularyData[key]);
+                }
+            }
+            break;
+    }
+
+    if (fullPool.length === 0) {
+        // Trường hợp này gần như không xảy ra nếu data có sẵn, nhưng để an toàn
+        MyModal.alert("Nguồn dữ liệu bạn chọn không có từ vựng. Thư viện chưa được tạo.");
+        return;
+    }
+    // === KẾT THÚC SỬA ĐỔI ===
+    
     const numStr = await MyModal.prompt("Bạn muốn học bao nhiêu từ?", "20");
     if (numStr === null || isNaN(numStr) || parseInt(numStr) <= 0) return;
     let numWords = parseInt(numStr);
 
-    let fullPool = [];
-    for (const key in vocabularyData) {
-        if (key !== 'numbers' && Array.isArray(vocabularyData[key])) {
-            fullPool = fullPool.concat(vocabularyData[key]);
-        }
-    }
+    
     const uniquePool = [...new Map(fullPool.map(item => [item['en'], item])).values()];
     let shuffledPool = shuffleArray(uniquePool);
     
     if (numWords > shuffledPool.length) {
-        MyModal.alert(`Chỉ có ${shuffledPool.length} từ trong kho.\nĐã tạo thư viện với ${shuffledPool.length} từ.`);
+        // Sửa lại câu thông báo cho rõ ràng
+        MyModal.alert(`Chỉ có ${shuffledPool.length} từ trong kho (từ các nguồn bạn đã chọn).\nĐã tạo thư viện với ${shuffledPool.length} từ.`);
         numWords = shuffledPool.length;
     }
     
@@ -3103,6 +3282,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const categoryButtons = document.querySelectorAll('.category-btn[data-quiz]');
     const backToMenuBtn = document.getElementById('back-to-menu-btn');
 
+    // === BIẾN MỚI CHO MENU GIỌNG ĐỌC ===
+    const voiceSelectMenu = document.getElementById('voiceSelectMenu');
+    // =================================
+
     window.showQuiz = function(quizId) {
         mainMenu.classList.add('hidden');
         quizArea.classList.remove('hidden');
@@ -3184,6 +3367,20 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('theme', isDark ? 'light' : 'dark');
     });
     
+    // === LOGIC MỚI CHO VIỆC TẢI GIỌNG ĐỌC ===
+    // Danh sách giọng đọc cần thời gian để tải,
+    // chúng ta phải lắng nghe sự kiện 'voiceschanged'
+    populateVoiceList(); // Chạy lần đầu (có thể danh sách rỗng)
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+        speechSynthesis.onvoiceschanged = populateVoiceList; // Chạy lại khi danh sách đã sẵn sàng
+    }
+
+    // Lắng nghe khi người dùng đổi giọng đọc và lưu lại
+    voiceSelectMenu?.addEventListener('change', () => {
+        localStorage.setItem('selectedVoiceURI', voiceSelectMenu.value);
+    });
+    // === KẾT THÚC LOGIC MỚI ===
+
     // --- SỰ KIỆN CHO BẢNG QUẢN LÝ (MỚI) ---
     const managerPanel = document.getElementById('manager-panel-overlay');
     const manageBtn = document.getElementById('manage-library-btn');
