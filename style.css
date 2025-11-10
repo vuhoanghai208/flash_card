@@ -505,3 +505,359 @@ body.dark-mode .quiz-options button.incorrect {
     border-color: #c82333;
     color: white;
 }
+/* ... (toàn bộ CSS quiz gốc của bạn không đổi) ... */
+
+/* =================================== */
+/* CSS THÊM CHO THƯ VIỆN               */
+/* =================================== */
+#main-menu hr {
+    border: none;
+    border-top: 1px solid #e0e0e0;
+    margin: 40px 0;
+}
+
+body.dark-mode #main-menu hr {
+    border-top-color: #4a4a4a;
+}
+
+#create-library-btn {
+    background-color: #28a745;
+    color: white;
+    border-color: #218838;
+    font-weight: bold;
+}
+
+#create-library-btn:hover {
+    background-color: #218838;
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+body.dark-mode #create-library-btn {
+    background-color: #38c172;
+    border-color: #2f9e5f;
+    color: #1a1a1a;
+}
+
+body.dark-mode #create-library-btn:hover {
+    background-color: #2f9e5f;
+    color: #ffffff;
+}
+
+/* Thêm h2 cho tiêu đề quiz tùy chỉnh */
+.unit-section h2 {
+    font-size: 1.8em;
+    color: #0056b3;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #007bff;
+}
+
+body.dark-mode .unit-section h2 {
+    color: #667eea;
+    border-bottom-color: #667eea;
+}
+/* ... (toàn bộ CSS cũ của bạn không đổi) ... */
+
+/* =================================== */
+/* CUSTOM MODAL STYLES (MỚI)         */
+/* =================================== */
+.custom-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    
+    /* === SỬA LỖI: TĂNG z-index LÊN CAO NHẤT === */
+    z-index: 4000; 
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
+    transition: opacity 0.2s ease-in-out;
+}
+.custom-modal-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.custom-modal-box {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 450px;
+    text-align: left;
+    transform: scale(1);
+    transition: transform 0.2s ease-in-out;
+}
+.custom-modal-overlay.hidden .custom-modal-box {
+    transform: scale(0.9);
+}
+
+#custom-modal-message {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+    line-height: 1.5;
+    white-space: pre-wrap; /* Cho phép xuống dòng */
+}
+
+#custom-modal-input {
+    width: 100%;
+    padding: 12px;
+    font-size: 1em;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    box-sizing: border-box; /* Thêm để padding không làm hỏng layout */
+}
+#custom-modal-input.hidden {
+    display: none;
+}
+
+#custom-modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+}
+
+#custom-modal-buttons button {
+    padding: 10px 25px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+#custom-modal-btn-cancel {
+    background-color: #f0f0f0;
+    color: #555;
+    border: 1px solid #ddd;
+}
+#custom-modal-btn-cancel:hover {
+    background-color: #e0e0e0;
+}
+
+#custom-modal-btn-ok {
+    background-color: #007bff;
+    color: white;
+}
+#custom-modal-btn-ok:hover {
+    background-color: #0056b3;
+}
+#custom-modal-btn-cancel.hidden {
+    display: none;
+}
+
+
+/* Dark Mode */
+body.dark-mode .custom-modal-box {
+    background: #2d2d2d;
+}
+body.dark-mode #custom-modal-message {
+    color: #e0e0e0;
+}
+body.dark-mode #custom-modal-input {
+    background-color: #4a5568;
+    border-color: #777;
+    color: #f0f0f0;
+}
+body.dark-mode #custom-modal-btn-cancel {
+    background-color: #4a5568;
+    border-color: #777;
+    color: #f0f0f0;
+}
+body.dark-mode #custom-modal-btn-cancel:hover {
+    background-color: #5a6578;
+}
+body.dark-mode #custom-modal-btn-ok {
+    background-color: #667eea;
+    color: #1a1a1a;
+}
+body.dark-mode #custom-modal-btn-ok:hover {
+    background-color: #5a65c8;
+}
+
+/* =================================== */
+/* CSS THÊM CHO NÚT QUẢN LÝ            */
+/* =================================== */
+
+/* Bọc 2 nút lại để dễ chia cột */
+.library-controls {
+    grid-template-columns: 1fr 1fr; /* Chia 2 cột bằng nhau */
+}
+
+#manage-library-btn {
+    background-color: #ffc107;
+    color: #212529;
+    border-color: #e0a800;
+    font-weight: bold;
+}
+
+#manage-library-btn:hover {
+    background-color: #e0a800;
+    color: #212529;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+}
+
+body.dark-mode #manage-library-btn {
+    background-color: #ffc107;
+    border-color: #e0a800;
+    color: #1a1a1a;
+}
+body.dark-mode #manage-library-btn:hover {
+    background-color: #e0a800;
+}
+
+
+/* =================================== */
+/* CSS BẢNG QUẢN LÝ (MỚI)           */
+/* =================================== */
+.manager-panel-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    
+    /* === z-index CƠ SỞ (THẤP HƠN ALERT) === */
+    z-index: 3000; 
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
+    transition: opacity 0.2s ease-in-out;
+}
+.manager-panel-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.manager-panel-box {
+    background: #f9f9f9;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    transform: scale(1);
+    transition: transform 0.2s ease-in-out;
+}
+.manager-panel-overlay.hidden .manager-panel-box {
+    transform: scale(0.9);
+}
+
+.manager-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+.manager-panel-header h2 {
+    margin: 0;
+    color: #0056b3;
+}
+
+.manager-panel-list {
+    overflow-y: auto;
+    padding-right: 10px; /* Thêm khoảng đệm cho thanh cuộn */
+}
+
+.manager-panel-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.manager-panel-item-name {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #333;
+}
+
+.manager-panel-item-actions button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-left: 10px;
+}
+
+.btn-view-lib {
+    background-color: #007bff;
+    color: white;
+}
+.btn-view-lib:hover {
+    background-color: #0056b3;
+}
+
+.btn-delete-lib {
+    background-color: #dc3545;
+    color: white;
+}
+.btn-delete-lib:hover {
+    background-color: #c82333;
+}
+
+.close-btn {
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #888;
+    background: none;
+    border: none;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+}
+.close-btn:hover {
+    color: #000;
+}
+
+/* Dark Mode cho Bảng Quản lý */
+body.dark-mode .manager-panel-box {
+    background: #2d2d2d;
+}
+body.dark-mode .manager-panel-header {
+    border-bottom-color: #4a4a4a;
+}
+body.dark-mode .manager-panel-header h2 {
+    color: #667eea;
+}
+body.dark-mode .manager-panel-item {
+    background: #252525;
+    border-color: #444;
+}
+body.dark-mode .manager-panel-item-name {
+    color: #e0e0e0;
+}
+body.dark-mode .close-btn {
+    color: #aaa;
+}
+body.dark-mode .close-btn:hover {
+    color: #fff;
+}
